@@ -1,19 +1,30 @@
+const path = require('path');
 const dotenv = require('dotenv');
-const result = dotenv.config();
+
+// Use absolute path for .env file
+const envPath = path.join(__dirname, '../.env');
+const result = dotenv.config({ path: envPath });
+
+console.log('-------------------------------------------');
+console.log('🔍 Diagnostic Info:');
+console.log('📂 Current Directory:', process.cwd());
+console.log('🏠 Script Directory:', __dirname);
+console.log('📄 Looking for .env at:', envPath);
 
 if (result.error) {
-    console.error('❌ Error loading .env file:', result.error);
+    console.error('❌ Error loading .env file:', result.error.message);
 } else {
     console.log('✅ .env file loaded successfully');
 }
 
+console.log('💎 MONGODB_URI exists:', !!process.env.MONGODB_URI);
 if (!process.env.MONGODB_URI) {
-    console.warn('⚠️  MONGODB_URI is not defined in environment variables!');
+    console.warn('⚠️  MONGODB_URI is MISSING!');
 }
+console.log('-------------------------------------------');
 
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 const connectDB = require('./config/db');
 
 // Import routes
