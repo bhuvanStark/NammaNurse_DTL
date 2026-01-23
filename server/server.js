@@ -1,0 +1,56 @@
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+const connectDB = require('./config/db');
+
+// Import routes
+const authRoutes = require('./routes/auth');
+const residentRoutes = require('./routes/residents');
+const reportRoutes = require('./routes/reports');
+const voiceRoutes = require('./routes/voice');
+
+const app = express();
+
+// Connect to MongoDB
+connectDB();
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Serve static files
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use(express.static(path.join(__dirname, '../client')));
+
+// API Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/residents', residentRoutes);
+app.use('/api/reports', reportRoutes);
+app.use('/api/voice', voiceRoutes);
+
+// Serve frontend
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/caretaker/login.html'));
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Server error:', err);
+    res.status(500).json({ error: err.message || 'Internal server error' });
+});
+
+// Start server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+    console.log('\n' + '='.repeat(60));
+    console.log('🏥  NAMMA NURSE - Voice-First AI Healthcare Assistant');
+    console.log('='.repeat(60));
+    console.log(`✅  Server running on http://localhost:${PORT}`);
+    console.log(`📱  Caretaker Login: http://localhost:${PORT}/caretaker/login.html`);
+    console.log(`🎤  Elderly Voice UI: http://localhost:${PORT}/elderly/voice.html`);
+    console.log('='.repeat(60) + '\n');
+});
+
+module.exports = app;

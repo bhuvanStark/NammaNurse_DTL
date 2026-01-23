@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Namma Nurse</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="../css/styles.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-blue-600">🏥<span id="orgName">Loading...</span></h1>
+                <p class="text-sm text-gray-600">Patient Dashboard</p>
+            </div>
+            <div class="flex gap-3">
+                <button id="addPatientBtn"
+                    class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-medium">
+                    ➕ Add Patient
+                </button>
+                <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">
+                    Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Search Bar -->
+        <div class="mb-6">
+            <input type="text" id="searchInput" placeholder="🔍 Search residents by name, room, or condition..."
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex items-center">
+                    <div class="text-3xl mr-4">👥</div>
+                    <div>
+                        <p class="text-gray-600 text-sm">Total Residents</p>
+                        <p class="text-2xl font-bold" id="totalCount">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex items-center">
+                    <div class="text-3xl mr-4">🔴</div>
+                    <div>
+                        <p class="text-gray-600 text-sm">Critical</p>
+                        <p class="text-2xl font-bold text-red-600" id="criticalCount">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex items-center">
+                    <div class="text-3xl mr-4">🟡</div>
+                    <div>
+                        <p class="text-gray-600 text-sm">Need Attention</p>
+                        <p class="text-2xl font-bold text-orange-500" id="attentionCount">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Residents Grid -->
+        <div id="residentsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Residents will be loaded here -->
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="text-center py-12">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p class="text-gray-600 mt-4">Loading patients...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="text-center py-12 hidden">
+            <p class="text-gray-600">No residents found</p>
+        </div>
+    </main>
+
+    <!-- Add Patient Modal -->
+    <div id="addPatientModal"
+        class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-800">Add New Patient</h2>
+                    <button id="closeModalBtn" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+                </div>
+
+                <form id="addPatientForm" class="space-y-4">
+                    <!-- Basic Information -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                            <input type="text" name="name" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Age *</label>
+                            <input type="number" name="age" required min="0" max="120"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Gender *</label>
+                            <select name="gender" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Room Number *</label>
+                            <input type="text" name="room" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <!-- Medical Information -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Medical Conditions</label>
+                        <textarea name="conditions" rows="2"
+                            placeholder="e.g., Diabetes, Hypertension (comma-separated)"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Allergies</label>
+                        <textarea name="allergies" rows="2" placeholder="e.g., Penicillin, Peanuts (comma-separated)"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Preferred Language</label>
+                        <select name="preferredLanguage"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="kannada">Kannada (ಕನ್ನಡ)</option>
+                            <option value="english">English</option>
+                        </select>
+                    </div>
+
+                    <!-- Emergency Contact -->
+                    <div class="border-t pt-4">
+                        <h3 class="font-medium text-gray-700 mb-3">Emergency Contact (Optional)</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                                <input type="text" name="emergencyName"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Relationship</label>
+                                <input type="text" name="emergencyRelationship" placeholder="e.g., Son, Daughter"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                                <input type="tel" name="emergencyPhone" placeholder="e.g., +91 9876543210"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Buttons -->
+                    <div class="flex gap-3 pt-4">
+                        <button type="submit"
+                            class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-medium">
+                            Create Patient
+                        </button>
+                        <button type="button" id="cancelBtn"
+                            class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/dashboard.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,82 @@
+/* Custom Styles for Namma Nurse */
+
+/* Status Badge Colors */
+.badge-normal {
+  background-color: #4CAF50;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.badge-attention {
+  background-color: #FF9800;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.badge-critical {
+  background-color: #F44336;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  animation: blink 1.5s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Resident Cards */
+.resident-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-left: 4px solid transparent;
+}
+
+.resident-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.resident-card.normal {
+  border-left-color: #4CAF50;
+}
+
+.resident-card.attention {
+  border-left-color: #FF9800;
+}
+
+.resident-card.critical {
+  border-left-color: #F44336;
+  background-color: #ffebee;
+}
+
+/* Biomarker Status */
+.biomarker-normal {
+  color: #4CAF50;
+  font-weight: bold;
+}
+
+.biomarker-low {
+  color: #2196F3;
+  font-weight: bold;
+}
+
+.biomarker-high {
+  color: #FF9800;
+  font-weight: bold;
+}
+
+.biomarker-critical {
+  color: #F44336;
+  font-weight: bold;
+  animation: blink 1s ease-in-out infinite;
+}
