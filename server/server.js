@@ -1,4 +1,16 @@
-require('dotenv').config();
+const dotenv = require('dotenv');
+const result = dotenv.config();
+
+if (result.error) {
+    console.error('❌ Error loading .env file:', result.error);
+} else {
+    console.log('✅ .env file loaded successfully');
+}
+
+if (!process.env.MONGODB_URI) {
+    console.warn('⚠️  MONGODB_URI is not defined in environment variables!');
+}
+
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -13,6 +25,7 @@ const voiceRoutes = require('./routes/voice');
 const app = express();
 
 // Connect to MongoDB
+console.log('🔌 Connecting to database...');
 connectDB();
 
 // Middleware
