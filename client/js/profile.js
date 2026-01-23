@@ -154,6 +154,7 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
     // Reload reports
     setTimeout(() => {
       loadReports();
+      loadTrendGraphs(); // Auto-update graphs
       fileInput.value = '';
       uploadStatus.classList.add('hidden');
     }, 2000);
@@ -198,7 +199,13 @@ const displayReports = (reports) => {
             <h4 class="font-semibold">${report.fileName}</h4>
             <p class="text-sm text-gray-600">📅 ${date}</p>
           </div>
-          ${report.criticalAlert ? '<span class="badge-critical">🚨 CRITICAL</span>' : ''}
+          <div class="flex gap-2">
+            ${report.criticalAlert ? '<span class="badge-critical">🚨 CRITICAL</span>' : ''}
+            <button onclick="deleteReport('${report._id}', '${report.fileName}')" 
+                    class="text-red-600 hover:text-red-800 text-sm font-semibold">
+              🗑️ Delete
+            </button>
+          </div>
         </div>
 
         ${report.biomarkers.length > 0 ? `
@@ -225,6 +232,24 @@ const displayReports = (reports) => {
   }).join('');
 
   document.getElementById('reportHistory').innerHTML = html;
+};
+
+// Delete report function
+window.deleteReport = async (reportId, fileName) => {
+  if (!confirm(`Are you sure you want to delete "${fileName}"?`)) {
+    return;
+  }
+
+  try {
+    await apiRequest(`/api/reports/${reportId}`, { method: 'DELETE' });
+    // Reload both reports and graphs
+    await loadReports();
+    await loadTrendGraphs();
+    alert('Report deleted and graphs updated!');
+  } catch (error) {
+    console.error('Error deleting report:', error);
+    alert('Failed to delete report');
+  }
 };
 
 // Load and render trend graphs
@@ -254,83 +279,223 @@ const renderTrendGraphs = (trends, conditions) => {
   // Determine which biomarkers to graph based on conditions
   const graphsToRender = [];
 
-  //Graph 1: Glucose (for all diabetic patients)
+  // Define biomarker priority and mappings
+  const biomarkerConfig = {
+    'Glucose (Fasting)': { title: 'Blood Sugar Trend', color: '#3B82F6', criticalLine: 126 },
+    'HbA1c': { title: 'HbA1c Trend (Diabetes Control)', color: '#EF4444', criticalLine: 5.7 },
+    'Creatinine': { title: 'Kidney Function (Creatinine)', color: '#8B5CF6', criticalLine: 1.3 },
+    'Cholesterol (Total)': { title: 'Cholesterol Trend', color: '#F59E0B', criticalLine: 200 },
+    'Hemoglobin': { title: 'Hemoglobin Levels', color: '#10B981', criticalLine: 12 },
+    'Vitamin D': { title: 'Vitamin D Levels', color: '#F97316', criticalLine: 30 },
+    'TSH': { title: 'Thyroid (TSH) Levels', color: '#EC4899', criticalLine: 4.0 },
+    'T3': { title: 'Thyroid T3 Levels', color: '#8B5CF6', criticalLine: null },
+    'T4': { title: 'Thyroid T4 Levels', color: '#06B6D4', criticalLine: null },
+    'Vitamin B12': { title: 'Vitamin B12 Levels', color: '#14B8A6', criticalLine: 200 },
+    'Blood Pressure': { title: 'Blood Pressure Trend', color: '#F43F5E', criticalLine: 120 },
+    'PSA': { title: 'PSA Levels', color: '#A855F7', criticalLine: 4.0 },
+    'Calcium': { title: 'Calcium Levels', color: '#0EA5E9', criticalLine: null },
+    'Urea': { title: 'Urea Levels', color: '#6366F1', criticalLine: 40 }
+  };
+
+  //=== CONDITION-SPECIFIC GRAPHS ===
+
+  // For diabetic patients
   if (conditions.some(c => c.toLowerCase().includes('diabetes'))) {
-    const glucoseData = datasets['Glucose (Fasting)'];
-    if (glucoseData) {
+    if (datasets['Glucose (Fasting)']) {
       graphsToRender.push({
         id: 'glucoseTrend',
-        title: 'Blood Sugar Trend',
-        biomarker: glucoseData,
-        color: '#3B82F6',
-        criticalLine: 126 // Pre-diabetic threshold
+        title: biomarkerConfig['Glucose (Fasting)'].title,
+        biomarker: datasets['Glucose (Fasting)'],
+        color: biomarkerConfig['Glucose (Fasting)'].color,
+        criticalLine: biomarkerConfig['Glucose (Fasting)'].criticalLine
       });
     }
 
-    // Graph 2: HbA1c for diabetic patients
-    const hba1cData = datasets['HbA1c'];
-    if (hba1cData) {
+    if (datasets['HbA1c']) {
       graphsToRender.push({
         id: 'hba1cTrend',
-        title: 'HbA1c Trend (Diabetes Control)',
-        biomarker: hba1cData,
-        color: '#EF4444',
-        criticalLine: 5.7 // Pre-diabetic threshold
+        title: biomarkerConfig['HbA1c'].title,
+        biomarker: datasets['HbA1c'],
+        color: biomarkerConfig['HbA1c'].color,
+        criticalLine: biomarkerConfig['HbA1c'].criticalLine
       });
     }
   }
 
-  // Graph 3: Condition-specific biomarker
+  // For kidney patients
   if (conditions.some(c => c.toLowerCase().includes('kidney'))) {
-    const creatinineData = datasets['Creatinine'];
-    if (creatinineData) {
+    if (datasets['Creatinine']) {
       graphsToRender.push({
         id: 'creatinineTrend',
-        title: 'Kidney Function (Creatinine)',
-        biomarker: creatinineData,
-        color: '#8B5CF6',
-        criticalLine: 1.3
-      });
-    }
-  } else if (conditions.some(c => c.toLowerCase().includes('heart') || c.toLowerCase().includes('hypertension'))) {
-    const cholesterolData = datasets['Cholesterol (Total)'];
-    if (cholesterolData) {
-      graphsToRender.push({
-        id: 'cholesterolTrend',
-        title: 'Cholesterol Trend',
-        biomarker: cholesterolData,
-        color: '#F59E0B',
-        criticalLine: 200
-      });
-    }
-  } else if (conditions.some(c => c.toLowerCase().includes('anemia'))) {
-    const hemoglobinData = datasets['Hemoglobin'];
-    if (hemoglobinData) {
-      graphsToRender.push({
-        id: 'hemoglobinTrend',
-        title: 'Hemoglobin Levels',
-        biomarker: hemoglobinData,
-        color: '#10B981',
-        criticalLine: 12 // Low threshold
-      });
-    }
-  } else if (conditions.some(c => c.toLowerCase().includes('osteo') || c.toLowerCase().includes('bone'))) {
-    const vitaminDData = datasets['Vitamin D'];
-    if (vitaminDData) {
-      graphsToRender.push({
-        id: 'vitaminDTrend',
-        title: 'Vitamin D Levels',
-        biomarker: vitaminDData,
-        color: '#F97316',
-        criticalLine: 30
+        title: biomarkerConfig['Creatinine'].title,
+        biomarker: datasets['Creatinine'],
+        color: biomarkerConfig['Creatinine'].color,
+        criticalLine: biomarkerConfig['Creatinine'].criticalLine
       });
     }
   }
 
-  // Render the graphs
+  // For heart/hypertension patients
+  if (conditions.some(c => c.toLowerCase().includes('heart') || c.toLowerCase().includes('hypertension'))) {
+    if (datasets['Cholesterol (Total)']) {
+      graphsToRender.push({
+        id: 'cholesterolTrend',
+        title: biomarkerConfig['Cholesterol (Total)'].title,
+        biomarker: datasets['Cholesterol (Total)'],
+        color: biomarkerConfig['Cholesterol (Total)'].color,
+        criticalLine: biomarkerConfig['Cholesterol (Total)'].criticalLine
+      });
+    }
+
+    if (datasets['Blood Pressure']) {
+      graphsToRender.push({
+        id: 'bpTrend',
+        title: biomarkerConfig['Blood Pressure'].title,
+        biomarker: datasets['Blood Pressure'],
+        color: biomarkerConfig['Blood Pressure'].color,
+        criticalLine: biomarkerConfig['Blood Pressure'].criticalLine
+      });
+    }
+  }
+
+  // For anemia patients
+  if (conditions.some(c => c.toLowerCase().includes('anemia'))) {
+    if (datasets['Hemoglobin']) {
+      graphsToRender.push({
+        id: 'hemoglobinTrend',
+        title: biomarkerConfig['Hemoglobin'].title,
+        biomarker: datasets['Hemoglobin'],
+        color: biomarkerConfig['Hemoglobin'].color,
+        criticalLine: biomarkerConfig['Hemoglobin'].criticalLine
+      });
+    }
+  }
+
+  // For bone/osteo patients
+  if (conditions.some(c => c.toLowerCase().includes('osteo') || c.toLowerCase().includes('bone'))) {
+    if (datasets['Vitamin D']) {
+      graphsToRender.push({
+        id: 'vitaminDTrend',
+        title: biomarkerConfig['Vitamin D'].title,
+        biomarker: datasets['Vitamin D'],
+        color: biomarkerConfig['Vitamin D'].color,
+        criticalLine: biomarkerConfig['Vitamin D'].criticalLine
+      });
+    }
+
+    if (datasets['Calcium']) {
+      graphsToRender.push({
+        id: 'calciumTrend',
+        title: biomarkerConfig['Calcium'].title,
+        biomarker: datasets['Calcium'],
+        color: biomarkerConfig['Calcium'].color,
+        criticalLine: biomarkerConfig['Calcium'].criticalLine
+      });
+    }
+  }
+
+  // For thyroid patients (Hypothyroidism, Hyperthyroidism)
+  if (conditions.some(c => c.toLowerCase().includes('thyroid') || c.toLowerCase().includes('hypothyroid') || c.toLowerCase().includes('hyperthyroid'))) {
+    if (datasets['TSH']) {
+      graphsToRender.push({
+        id: 'tshTrend',
+        title: biomarkerConfig['TSH'].title,
+        biomarker: datasets['TSH'],
+        color: biomarkerConfig['TSH'].color,
+        criticalLine: biomarkerConfig['TSH'].criticalLine
+      });
+    }
+
+    if (datasets['T3']) {
+      graphsToRender.push({
+        id: 't3Trend',
+        title: biomarkerConfig['T3'].title,
+        biomarker: datasets['T3'],
+        color: biomarkerConfig['T3'].color,
+        criticalLine: biomarkerConfig['T3'].criticalLine
+      });
+    }
+
+    if (datasets['T4']) {
+      graphsToRender.push({
+        id: 't4Trend',
+        title: biomarkerConfig['T4'].title,
+        biomarker: datasets['T4'],
+        color: biomarkerConfig['T4'].color,
+        criticalLine: biomarkerConfig['T4'].criticalLine
+      });
+    }
+  }
+
+  // For dementia/cognitive patients
+  if (conditions.some(c => c.toLowerCase().includes('dementia') || c.toLowerCase().includes('cognitive') || c.toLowerCase().includes('alzheimer'))) {
+    if (datasets['Vitamin B12']) {
+      graphsToRender.push({
+        id: 'b12Trend',
+        title: biomarkerConfig['Vitamin B12'].title,
+        biomarker: datasets['Vitamin B12'],
+        color: biomarkerConfig['Vitamin B12'].color,
+        criticalLine: biomarkerConfig['Vitamin B12'].criticalLine
+      });
+    }
+
+    if (datasets['Glucose (Fasting)'] && !graphsToRender.find(g => g.id === 'glucoseTrend')) {
+      graphsToRender.push({
+        id: 'glucoseTrend',
+        title: biomarkerConfig['Glucose (Fasting)'].title,
+        biomarker: datasets['Glucose (Fasting)'],
+        color: biomarkerConfig['Glucose (Fasting)'].color,
+        criticalLine: biomarkerConfig['Glucose (Fasting)'].criticalLine
+      });
+    }
+  }
+
+  // For prostate patients
+  if (conditions.some(c => c.toLowerCase().includes('prostate'))) {
+    if (datasets['PSA']) {
+      graphsToRender.push({
+        id: 'psaTrend',
+        title: biomarkerConfig['PSA'].title,
+        biomarker: datasets['PSA'],
+        color: biomarkerConfig['PSA'].color,
+        criticalLine: biomarkerConfig['PSA'].criticalLine
+      });
+    }
+  }
+
+  //=== FALLBACK: If no condition-specific graphs, show any available biomarkers ===
+  if (graphsToRender.length === 0) {
+    console.log('📊 No condition-specific graphs. Showing all available biomarkers...');
+
+    // Priority order for general health monitoring
+    const fallbackPriority = [
+      'Glucose (Fasting)', 'HbA1c', 'Cholesterol (Total)', 'Hemoglobin',
+      'Blood Pressure', 'Creatinine', 'Vitamin D', 'Vitamin B12',
+      'TSH', 'T3', 'T4', 'Calcium', 'PSA', 'Urea'
+    ];
+
+    let graphIndex = 0;
+    fallbackPriority.forEach(biomarkerName => {
+      if (graphIndex >= 3) return; // Limit to 3 graphs
+
+      if (datasets[biomarkerName] && datasets[biomarkerName].data.length >= 2) {
+        const config = biomarkerConfig[biomarkerName];
+        graphsToRender.push({
+          id: biomarkerName.replace(/\s+/g, '').replace(/[()]/g, '') + 'Trend',
+          title: config.title,
+          biomarker: datasets[biomarkerName],
+          color: config.color,
+          criticalLine: config.criticalLine
+        });
+        graphIndex++;
+      }
+    });
+  }
+
+  // Final check: if still no graphs, show message
   if (graphsToRender.length === 0) {
     document.getElementById('trendsSection').innerHTML =
-      '<p class="text-gray-600">Insufficient biomarker data for trend visualization.</p>';
+      '<p class="text-gray-600">Upload at least 2 medical reports to see trend visualization.</p>';
     return;
   }
 

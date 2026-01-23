@@ -42,18 +42,23 @@ const displayResidents = (residents) => {
     const riskBadge = getRiskBadge(resident.riskLevel);
 
     return `
-      <div class="bg-white rounded-lg shadow hover:shadow-lg transition cursor-pointer resident-card ${resident.riskLevel}"
-           onclick="window.location.href='/caretaker/profile.html?id=${resident._id}'">
+      <div class="bg-white rounded-lg shadow hover:shadow-lg transition resident-card ${resident.riskLevel}">
         <div class="p-6">
           <div class="flex justify-between items-start mb-4">
-            <div>
+            <div class="cursor-pointer flex-1" onclick="window.location.href='/caretaker/profile.html?id=${resident._id}'">
               <h3 class="text-xl font-bold text-gray-800">${riskIcon} ${resident.name}</h3>
               <p class="text-gray-600">${resident.age}y, ${resident.gender} • Room ${resident.room}</p>
             </div>
-            <span class="${riskBadge.class}">${riskBadge.text}</span>
+            <div class="flex flex-col gap-2 items-end">
+              <span class="${riskBadge.class}">${riskBadge.text}</span>
+              <button onclick="deletePatient('${resident._id}', '${resident.name}')" 
+                      class="text-red-600 hover:text-red-800 text-sm font-semibold hover:underline">
+                🗑️ Delete
+              </button>
+            </div>
           </div>
           
-          <div class="space-y-2">
+          <div class="space-y-2 cursor-pointer" onclick="window.location.href='/caretaker/profile.html?id=${resident._id}'">
             <div class="text-sm">
               <span class="font-semibold">Conditions:</span>
               <p class="text-gray-700">${resident.conditions.join(', ') || 'None'}</p>
@@ -208,6 +213,27 @@ addPatientForm.addEventListener('submit', async (e) => {
     submitBtn.textContent = 'Create Patient';
   }
 });
+
+// Delete patient function
+window.deletePatient = async (patientId, patientName) => {
+  // Stop event propagation to prevent card click
+  event.stopPropagation();
+
+  if (!confirm(`Are you sure you want to delete "${patientName}"?\n\nThis will permanently delete the patient and ALL their medical reports. This action cannot be undone.`)) {
+    return;
+  }
+
+  try {
+    await apiRequest(`/api/residents/${patientId}`, { method: 'DELETE' });
+    alert(`${patientName} has been deleted successfully.`);
+
+    // Reload residents list
+    await loadResidents();
+  } catch (error) {
+    console.error('Error deleting patient:', error);
+    alert('Failed to delete patient: ' + error.message);
+  }
+};
 
 // Load residents on page load
 loadResidents();

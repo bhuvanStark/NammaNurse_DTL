@@ -1,0 +1,22 @@
+MEDICAL LABORATORY REPORT
+=========================
+
+Patient: Test Patient
+Date: January 23, 2026
+
+BLOOD CHEMISTRY PANEL
+---------------------
+
+Glucose (Fasting): 145 mg/dL
+HbA1c: 7.2%
+Total Cholesterol: 220 mg/dL
+Creatinine: 1.4 mg/dL
+Hemoglobin: 11.5 g/dL
+
+Blood Pressure: 145/92 mmHg
+
+NOTES:
+- Glucose levels elevated
+- HbA1c indicates poor glycemic control
+- Cholesterol borderline high
+- Monitor kidney function

@@ -5,6 +5,7 @@ const upload = require('../middleware/upload');
 const Report = require('../models/Report');
 const Resident = require('../models/Resident');
 const { extractTextFromFile } = require('../services/ocrService');
+const { extractBiomarkersFromImage } = require('../services/visionService');
 const { parseBiomarkers, hasCriticalValues } = require('../services/biomarkerParser');
 const { generateHealthSummary } = require('../services/llmService');
 const { sendCriticalAlert } = require('../services/alertService');
@@ -32,14 +33,44 @@ router.post('/upload', auth, upload.single('report'), async (req, res) => {
         // Create report record
         const fileExt = path.extname(req.file.originalname).substring(1).toLowerCase();
 
+        // Auto-generate monthLabel and monthIndex for trend graphs
+        // Find the latest report for this resident
+        const latestReport = await Report.findOne({ residentId })
+            .sort({ monthIndex: -1, uploadDate: -1 })
+            .limit(1);
+
+        let monthIndex = 1;
+        let monthLabel = 'Month 1';
+
+        if (latestReport && latestReport.monthIndex) {
+            // Increment from the last report
+            monthIndex = latestReport.monthIndex + 1;
+
+            // Generate a readable month label based on current date
+            const currentDate = new Date();
+            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            monthLabel = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+        } else {
+            // First report - use current month
+            const currentDate = new Date();
+            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            monthLabel = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+        }
+
         const report = new Report({
             residentId,
             fileName: req.file.originalname,
             fileUrl: req.file.path,
-            fileType: fileExt
+            fileType: fileExt,
+            monthIndex,
+            monthLabel
         });
 
         await report.save();
+
+        console.log(`📄 Created report with monthLabel: ${monthLabel} (index: ${monthIndex})`);
 
         res.status(201).json({
             message: 'Report uploaded successfully',
@@ -68,17 +99,72 @@ router.post('/parse/:reportId', auth, async (req, res) => {
 
         console.log('🔬 Starting report analysis...');
 
-        // Step 1: Extract text using OCR
-        const ocrText = await extractTextFromFile(report.fileUrl, report.fileType);
-        report.rawText = ocrText;
+        let biomarkers = [];
 
-        // Step 2: Parse biomarkers
-        const biomarkers = parseBiomarkers(ocrText);
+        // Step 1: For images, use Gemini Vision for better accuracy
+        if (['jpg', 'jpeg', 'png'].includes(report.fileType.toLowerCase())) {
+            console.log('🖼️ Using Gemini Vision for image analysis...');
+            try {
+                biomarkers = await extractBiomarkersFromImage(report.fileUrl);
+
+                // Add status and normal ranges to vision-extracted biomarkers
+                biomarkers = biomarkers.map(bio => {
+                    const value = parseFloat(bio.value);
+                    let status = 'normal';
+                    let normalRange = bio.normalRange || '';
+
+                    // Determine status based on biomarker name and value
+                    if (bio.name.toLowerCase().includes('hba1c')) {
+                        normalRange = normalRange || '< 5.7%';
+                        if (value >= 9) status = 'critical';
+                        else if (value > 6.5) status = 'high';
+                    } else if (bio.name.toLowerCase().includes('glucose')) {
+                        normalRange = normalRange || '70-100 mg/dL';
+                        if (value >= 250) status = 'critical';
+                        else if (value > 125) status = 'high';
+                        else if (value < 70) status = 'low';
+                    } else if (bio.name.toLowerCase().includes('creatinine')) {
+                        normalRange = normalRange || '0.6-1.2 mg/dL';
+                        if (value >= 2.5) status = 'critical';
+                        else if (value > 1.3) status = 'high';
+                    } else if (bio.name.toLowerCase().includes('hemoglobin')) {
+                        normalRange = normalRange || '12-16 g/dL';
+                        if (value <= 8) status = 'critical';
+                        else if (value < 10) status = 'low';
+                    }
+
+                    return { ...bio, status, normalRange };
+                });
+
+                report.rawText = 'Analyzed using Gemini Vision API';
+            } catch (visionError) {
+                console.log('⚠️ Vision API failed, falling back to OCR:', visionError.message);
+                // Fallback to OCR if vision fails
+                const ocrText = await extractTextFromFile(report.fileUrl, report.fileType);
+                report.rawText = ocrText;
+                biomarkers = parseBiomarkers(ocrText);
+            }
+        } else {
+            // Step 1B: For PDFs, use traditional OCR + parsing
+            console.log('📄 Using OCR for PDF analysis...');
+            const ocrText = await extractTextFromFile(report.fileUrl, report.fileType);
+            report.rawText = ocrText;
+            biomarkers = parseBiomarkers(ocrText);
+        }
+
         report.biomarkers = biomarkers;
 
         // Step 3: Generate AI summaries
-        const summaryEnglish = await generateHealthSummary(biomarkers, 'english');
-        const summaryKannada = await generateHealthSummary(biomarkers, 'kannada');
+        let summaryEnglish, summaryKannada;
+
+        if (biomarkers.length === 0) {
+            console.log('⚠️ No biomarkers found in report');
+            summaryEnglish = 'No biomarkers could be extracted from this report. Please ensure the report contains standard medical test results (Glucose, HbA1c, Cholesterol, Creatinine, Hemoglobin, Blood Pressure, etc.)';
+            summaryKannada = 'ಈ ವರದಿಯಿಂದ ಯಾವುದೇ ಬಯೋಮಾರ್ಕರ್‌ಗಳನ್ನು ಹೊರತೆಗೆಯಲಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ವರದಿಯಲ್ಲಿ ಪ್ರಮಾಣಿತ ವೈದ್ಯಕೀಯ ಪರೀಕ್ಷಾ ಫಲಿತಾಂಶಗಳಿವೆಯೆ ಎಂದು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ.';
+        } else {
+            summaryEnglish = await generateHealthSummary(biomarkers, 'english');
+            summaryKannada = await generateHealthSummary(biomarkers, 'kannada');
+        }
 
         report.summaryEnglish = summaryEnglish;
         report.summaryKannada = summaryKannada;
@@ -134,6 +220,41 @@ router.get('/resident/:residentId', auth, async (req, res) => {
     }
 });
 
+// Delete report
+router.delete('/:reportId', auth, async (req, res) => {
+    try {
+        const report = await Report.findById(req.params.reportId).populate('residentId');
+
+        if (!report) {
+            return res.status(404).json({ error: 'Report not found' });
+        }
+
+        // Verify organization access
+        if (report.residentId.orgId.toString() !== req.orgId.toString()) {
+            return res.status(403).json({ error: 'Access denied' });
+        }
+
+        // Delete the report file if it exists
+        const fs = require('fs').promises;
+        const path = require('path');
+        try {
+            await fs.unlink(report.fileUrl);
+        } catch (err) {
+            console.log('File already deleted or not found');
+        }
+
+        // Delete from database
+        await Report.findByIdAndDelete(req.params.reportId);
+
+        console.log(`✅ Deleted report: ${report.fileName}`);
+        res.json({ message: 'Report deleted successfully' });
+
+    } catch (error) {
+        console.error('Error deleting report:', error);
+        res.status(500).json({ error: 'Failed to delete report' });
+    }
+});
+
 // Get latest report for a resident
 router.get('/latest/:residentId', auth, async (req, res) => {
     try {
@@ -155,6 +276,8 @@ router.get('/latest/:residentId', auth, async (req, res) => {
 // Get trend data for graphs (chronologically sorted monthly reports)
 router.get('/trends/:residentId', auth, async (req, res) => {
     try {
+        console.log('📊 Trends API called for resident:', req.params.residentId);
+
         // Verify resident belongs to this organization
         const resident = await Resident.findOne({
             _id: req.params.residentId,
@@ -162,13 +285,18 @@ router.get('/trends/:residentId', auth, async (req, res) => {
         });
 
         if (!resident) {
+            console.log('❌ Resident not found for ID:', req.params.residentId);
             return res.status(404).json({ error: 'Resident not found' });
         }
+
+        console.log('✅ Resident found:', resident.name);
 
         // Get all reports sorted by month index for trend visualization
         const reports = await Report.find({ residentId: req.params.residentId })
             .sort({ monthIndex: 1, uploadDate: 1 })
             .select('monthLabel monthIndex biomarkers uploadDate summaryEnglish');
+
+        console.log(`📄 Found ${reports.length} reports for trends`);
 
         // Extract trend data by biomarker
         const trends = {
@@ -219,8 +347,9 @@ router.get('/trends/:residentId', auth, async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error fetching trend data:', error);
-        res.status(500).json({ error: 'Failed to fetch trend data' });
+        console.error('❌ Trends API error:', error.message);
+        console.error('Stack:', error.stack);
+        res.status(500).json({ error: 'Failed to fetch trend data', details: error.message });
     }
 });
 

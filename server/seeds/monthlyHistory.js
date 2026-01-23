@@ -22,10 +22,10 @@ const createBiomarkers = (values) => {
 // 3-Month History Data for Each Patient
 const patientHistories = {
     'Ramesh Kumar': [
-        // Month 1 - January 2026
+        // Month 1 - October 2025
         {
             monthIndex: 1,
-            monthLabel: 'Jan 2026',
+            monthLabel: 'Oct 2025',
             biomarkers: createBiomarkers({
                 'Glucose (Fasting)': { value: 155, unit: 'mg/dL', normalRange: '70-100', status: 'high' },
                 'HbA1c': { value: 7.3, unit: '%', normalRange: '4.0-5.6', status: 'high' },
@@ -35,10 +35,10 @@ const patientHistories = {
             }),
             summary: 'Blood sugar slightly elevated. Cholesterol borderline. Continue diet control.'
         },
-        // Month 2 - February 2026
+        // Month 2 - November 2025
         {
             monthIndex: 2,
-            monthLabel: 'Feb 2026',
+            monthLabel: 'Nov 2025',
             biomarkers: createBiomarkers({
                 'Glucose (Fasting)': { value: 162, unit: 'mg/dL', normalRange: '70-100', status: 'high' },
                 'HbA1c': { value: 7.6, unit: '%', normalRange: '4.0-5.6', status: 'high' },
@@ -48,10 +48,10 @@ const patientHistories = {
             }),
             summary: 'Sugar trend rising. Needs better dietary control. Monitor closely.'
         },
-        // Month 3 - March 2026
+        // Month 3 - December 2025
         {
             monthIndex: 3,
-            monthLabel: 'Mar 2026',
+            monthLabel: 'Dec 2025',
             biomarkers: createBiomarkers({
                 'Glucose (Fasting)': { value: 170, unit: 'mg/dL', normalRange: '70-100', status: 'high' },
                 'HbA1c': { value: 7.9, unit: '%', normalRange: '4.0-5.6', status: 'high' },
@@ -67,7 +67,7 @@ const patientHistories = {
         // Improving Vitamin D trend
         {
             monthIndex: 1,
-            monthLabel: 'Jan 2026',
+            monthLabel: 'Oct 2025',
             biomarkers: createBiomarkers({
                 'Vitamin D': { value: 18, unit: 'ng/mL', normalRange: '30-100', status: 'low' },
                 'Calcium': { value: 8.9, unit: 'mg/dL', normalRange: '8.5-10.2', status: 'normal' },
@@ -78,7 +78,7 @@ const patientHistories = {
         },
         {
             monthIndex: 2,
-            monthLabel: 'Feb 2026',
+            monthLabel: 'Nov 2025',
             biomarkers: createBiomarkers({
                 'Vitamin D': { value: 22, unit: 'ng/mL', normalRange: '30-100', status: 'low' },
                 'Calcium': { value: 9.1, unit: 'mg/dL', normalRange: '8.5-10.2', status: 'normal' },
@@ -89,7 +89,7 @@ const patientHistories = {
         },
         {
             monthIndex: 3,
-            monthLabel: 'Mar 2026',
+            monthLabel: 'Dec 2025',
             biomarkers: createBiomarkers({
                 'Vitamin D': { value: 26, unit: 'ng/mL', normalRange: '30-100', status: 'low' },
                 'Calcium': { value: 9.3, unit: 'mg/dL', normalRange: '8.5-10.2', status: 'normal' },
@@ -104,7 +104,7 @@ const patientHistories = {
         // Kidney disease worsening
         {
             monthIndex: 1,
-            monthLabel: 'Jan 2026',
+            monthLabel: 'Oct 2025',
             biomarkers: createBiomarkers({
                 'Creatinine': { value: 1.6, unit: 'mg/dL', normalRange: '0.7-1.3', status: 'high' },
                 'Hemoglobin': { value: 10.8, unit: 'g/dL', normalRange: '13.5-17.5', status: 'low' },
@@ -115,7 +115,7 @@ const patientHistories = {
         },
         {
             monthIndex: 2,
-            monthLabel: 'Feb 2026',
+            monthLabel: 'Nov 2025',
             biomarkers: createBiomarkers({
                 'Creatinine': { value: 1.7, unit: 'mg/dL', normalRange: '0.7-1.3', status: 'high' },
                 'Hemoglobin': { value: 10.5, unit: 'g/dL', normalRange: '13.5-17.5', status: 'low' },
@@ -126,7 +126,7 @@ const patientHistories = {
         },
         {
             monthIndex: 3,
-            monthLabel: 'Mar 2026',
+            monthLabel: 'Dec 2025',
             biomarkers: createBiomarkers({
                 'Creatinine': { value: 1.8, unit: 'mg/dL', normalRange: '0.7-1.3', status: 'high' },
                 'Hemoglobin': { value: 10.2, unit: 'g/dL', normalRange: '13.5-17.5', status: 'low' },
@@ -141,7 +141,7 @@ const patientHistories = {
         // Stable thyroid
         {
             monthIndex: 1,
-            monthLabel: 'Jan 2026',
+            monthLabel: 'Oct 2025',
             biomarkers: createBiomarkers({
                 'TSH': { value: 5.2, unit: 'μIU/mL', normalRange: '0.4-4.0', status: 'high' },
                 'T3': { value: 95, unit: 'ng/dL', normalRange: '80-200', status: 'normal' },
@@ -152,7 +152,7 @@ const patientHistories = {
         },
         {
             monthIndex: 2,
-            monthLabel: 'Feb 2026',
+            monthLabel: 'Nov 2025',
             biomarkers: createBiomarkers({
                 'TSH': { value: 4.9, unit: 'μIU/mL', normalRange: '0.4-4.0', status: 'high' },
                 'T3': { value: 98, unit: 'ng/dL', normalRange: '80-200', status: 'normal' },
@@ -163,7 +163,7 @@ const patientHistories = {
         },
         {
             monthIndex: 3,
-            monthLabel: 'Mar 2026',
+            monthLabel: 'Dec 2025',
             biomarkers: createBiomarkers({
                 'TSH': { value: 4.6, unit: 'μIU/mL', normalRange: '0.4-4.0', status: 'high' },
                 'T3': { value: 102, unit: 'ng/dL', normalRange: '80-200', status: 'normal' },
@@ -178,7 +178,7 @@ const patientHistories = {
         // COPD + Diabetes borderline
         {
             monthIndex: 1,
-            monthLabel: 'Jan 2026',
+            monthLabel: 'Oct 2025',
             biomarkers: createBiomarkers({
                 'Glucose (Fasting)': { value: 135, unit: 'mg/dL', normalRange: '70-100', status: 'high' },
                 'HbA1c': { value: 6.8, unit: '%', normalRange: '4.0-5.6', status: 'high' },
@@ -189,7 +189,7 @@ const patientHistories = {
         },
         {
             monthIndex: 2,
-            monthLabel: 'Feb 2026',
+            monthLabel: 'Nov 2025',
             biomarkers: createBiomarkers({
                 'Glucose (Fasting)': { value: 142, unit: 'mg/dL', normalRange: '70-100', status: 'high' },
                 'HbA1c': { value: 7.1, unit: '%', normalRange: '4.0-5.6', status: 'high' },
@@ -200,7 +200,7 @@ const patientHistories = {
         },
         {
             monthIndex: 3,
-            monthLabel: 'Mar 2026',
+            monthLabel: 'Dec 2025',
             biomarkers: createBiomarkers({
                 'Glucose (Fasting)': { value: 148, unit: 'mg/dL', normalRange: '70-100', status: 'high' },
                 'HbA1c': { value: 7.4, unit: '%', normalRange: '4.0-5.6', status: 'high' },
@@ -215,7 +215,7 @@ const patientHistories = {
         // Mild dementia, stable
         {
             monthIndex: 1,
-            monthLabel: 'Jan 2026',
+            monthLabel: 'Oct 2025',
             biomarkers: createBiomarkers({
                 'Vitamin B12': { value: 285, unit: 'pg/mL', normalRange: '200-900', status: 'normal' },
                 'Hemoglobin': { value: 12.8, unit: 'g/dL', normalRange: '12.0-15.5', status: 'normal' },
@@ -226,7 +226,7 @@ const patientHistories = {
         },
         {
             monthIndex: 2,
-            monthLabel: 'Feb 2026',
+            monthLabel: 'Nov 2025',
             biomarkers: createBiomarkers({
                 'Vitamin B12': { value: 290, unit: 'pg/mL', normalRange: '200-900', status: 'normal' },
                 'Hemoglobin': { value: 12.9, unit: 'g/dL', normalRange: '12.0-15.5', status: 'normal' },
@@ -237,7 +237,7 @@ const patientHistories = {
         },
         {
             monthIndex: 3,
-            monthLabel: 'Mar 2026',
+            monthLabel: 'Dec 2025',
             biomarkers: createBiomarkers({
                 'Vitamin B12': { value: 295, unit: 'pg/mL', normalRange: '200-900', status: 'normal' },
                 'Hemoglobin': { value: 13.0, unit: 'g/dL', normalRange: '12.0-15.5', status: 'normal' },
@@ -252,7 +252,7 @@ const patientHistories = {
         // Heart failure - improving cholesterol
         {
             monthIndex: 1,
-            monthLabel: 'Jan 2026',
+            monthLabel: 'Oct 2025',
             biomarkers: createBiomarkers({
                 'Cholesterol (Total)': { value: 235, unit: 'mg/dL', normalRange: '<200', status: 'high' },
                 'LDL': { value: 155, unit: 'mg/dL', normalRange: '<100', status: 'high' },
@@ -264,7 +264,7 @@ const patientHistories = {
         },
         {
             monthIndex: 2,
-            monthLabel: 'Feb 2026',
+            monthLabel: 'Nov 2025',
             biomarkers: createBiomarkers({
                 'Cholesterol (Total)': { value: 228, unit: 'mg/dL', normalRange: '<200', status: 'high' },
                 'LDL': { value: 148, unit: 'mg/dL', normalRange: '<100', status: 'high' },
@@ -276,7 +276,7 @@ const patientHistories = {
         },
         {
             monthIndex: 3,
-            monthLabel: 'Mar 2026',
+            monthLabel: 'Dec 2025',
             biomarkers: createBiomarkers({
                 'Cholesterol (Total)': { value: 220, unit: 'mg/dL', normalRange: '<200', status: 'high' },
                 'LDL': { value: 142, unit: 'mg/dL', normalRange: '<100', status: 'high' },
@@ -292,7 +292,7 @@ const patientHistories = {
         // Osteoporosis - stable
         {
             monthIndex: 1,
-            monthLabel: 'Jan 2026',
+            monthLabel: 'Oct 2025',
             biomarkers: createBiomarkers({
                 'Calcium': { value: 9.1, unit: 'mg/dL', normalRange: '8.5-10.2', status: 'normal' },
                 'Vitamin D': { value: 32, unit: 'ng/mL', normalRange: '30-100', status: 'normal' },
@@ -303,7 +303,7 @@ const patientHistories = {
         },
         {
             monthIndex: 2,
-            monthLabel: 'Feb 2026',
+            monthLabel: 'Nov 2025',
             biomarkers: createBiomarkers({
                 'Calcium': { value: 9.2, unit: 'mg/dL', normalRange: '8.5-10.2', status: 'normal' },
                 'Vitamin D': { value: 34, unit: 'ng/mL', normalRange: '30-100', status: 'normal' },
@@ -314,7 +314,7 @@ const patientHistories = {
         },
         {
             monthIndex: 3,
-            monthLabel: 'Mar 2026',
+            monthLabel: 'Dec 2025',
             biomarkers: createBiomarkers({
                 'Calcium': { value: 9.3, unit: 'mg/dL', normalRange: '8.5-10.2', status: 'normal' },
                 'Vitamin D': { value: 36, unit: 'ng/mL', normalRange: '30-100', status: 'normal' },
@@ -329,7 +329,7 @@ const patientHistories = {
         // Prostate + Diabetes
         {
             monthIndex: 1,
-            monthLabel: 'Jan 2026',
+            monthLabel: 'Oct 2025',
             biomarkers: createBiomarkers({
                 'PSA': { value: 5.2, unit: 'ng/mL', normalRange: '<4.0', status: 'high' },
                 'Glucose (Fasting)': { value: 145, unit: 'mg/dL', normalRange: '70-100', status: 'high' },
@@ -340,7 +340,7 @@ const patientHistories = {
         },
         {
             monthIndex: 2,
-            monthLabel: 'Feb 2026',
+            monthLabel: 'Nov 2025',
             biomarkers: createBiomarkers({
                 'PSA': { value: 5.1, unit: 'ng/mL', normalRange: '<4.0', status: 'high' },
                 'Glucose (Fasting)': { value: 152, unit: 'mg/dL', normalRange: '70-100', status: 'high' },
@@ -351,7 +351,7 @@ const patientHistories = {
         },
         {
             monthIndex: 3,
-            monthLabel: 'Mar 2026',
+            monthLabel: 'Dec 2025',
             biomarkers: createBiomarkers({
                 'PSA': { value: 5.0, unit: 'ng/mL', normalRange: '<4.0', status: 'high' },
                 'Glucose (Fasting)': { value: 158, unit: 'mg/dL', normalRange: '70-100', status: 'high' },
@@ -366,7 +366,7 @@ const patientHistories = {
         // Hypertension improving
         {
             monthIndex: 1,
-            monthLabel: 'Jan 2026',
+            monthLabel: 'Oct 2025',
             biomarkers: createBiomarkers({
                 'Blood Pressure': { value: '148/92', unit: 'mmHg', normalRange: '<120/80', status: 'high' },
                 'Cholesterol (Total)': { value: 210, unit: 'mg/dL', normalRange: '<200', status: 'high' },
@@ -377,7 +377,7 @@ const patientHistories = {
         },
         {
             monthIndex: 2,
-            monthLabel: 'Feb 2026',
+            monthLabel: 'Nov 2025',
             biomarkers: createBiomarkers({
                 'Blood Pressure': { value: '142/88', unit: 'mmHg', normalRange: '<120/80', status: 'high' },
                 'Cholesterol (Total)': { value: 205, unit: 'mg/dL', normalRange: '<200', status: 'high' },
@@ -388,7 +388,7 @@ const patientHistories = {
         },
         {
             monthIndex: 3,
-            monthLabel: 'Mar 2026',
+            monthLabel: 'Dec 2025',
             biomarkers: createBiomarkers({
                 'Blood Pressure': { value: '138/85', unit: 'mmHg', normalRange: '<120/80', status: 'high' },
                 'Cholesterol (Total)': { value: 198, unit: 'mg/dL', normalRange: '<200', status: 'normal' },
@@ -428,7 +428,7 @@ async function seedMonthlyHistory() {
 
             for (const monthData of months) {
                 // Create base date for each month
-                const monthDate = new Date(2026, monthData.monthIndex - 1, 15); // Mid-month
+                const monthDate = new Date(2025, monthData.monthIndex + 8, 15); // Mid-month
 
                 const report = new Report({
                     residentId: resident._id,
