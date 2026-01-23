@@ -1,23 +1,22 @@
 const path = require('path');
+const fs = require('fs');
 const dotenv = require('dotenv');
 
-// Use absolute path for .env file
+// Load environment variables
 const envPath = path.join(__dirname, '../.env');
-const result = dotenv.config({ path: envPath });
+if (fs.existsSync(envPath)) {
+    dotenv.config({ path: envPath });
+    console.log('✅ .env file loaded successfully');
+} else {
+    console.log('ℹ️  No .env file found, using system environment variables');
+}
 
 console.log('-------------------------------------------');
 console.log('🔍 Diagnostic Info:');
 console.log('📂 Current Directory:', process.cwd());
 console.log('🏠 Script Directory:', __dirname);
-console.log('📄 Looking for .env at:', envPath);
-
-if (result.error) {
-    console.error('❌ Error loading .env file:', result.error.message);
-} else {
-    console.log('✅ .env file loaded successfully');
-}
-
 console.log('💎 MONGODB_URI exists:', !!process.env.MONGODB_URI);
+
 if (!process.env.MONGODB_URI) {
     console.warn('⚠️  MONGODB_URI is MISSING!');
 }

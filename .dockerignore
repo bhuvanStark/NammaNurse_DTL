@@ -1,0 +1,12 @@
+node_modules
+npm-debug.log
+.git
+.env
+.DS_Store
+uploads/*
+!uploads/.gitkeep
+brain/
+*.md
+LICENSE
+.gitignore
+.dockerignore
