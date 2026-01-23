@@ -1,7 +1,5 @@
 // Patient Profile JavaScript
 
-requireAuth();
-
 // Get resident ID from URL
 const urlParams = new URLSearchParams(window.location.search);
 const residentId = urlParams.get('id');
@@ -131,9 +129,6 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
   try {
     const response = await fetch('/api/reports/upload', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${getToken()}`
-      },
       body: formData
     });
 
