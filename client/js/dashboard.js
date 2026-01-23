@@ -1,11 +1,9 @@
 // Dashboard JavaScript
 
-requireAuth();
-
 let allResidents = [];
 
-// Load organization name
-document.getElementById('orgName').textContent = localStorage.getItem('orgName') || 'Dashboard';
+// Set generic dashboard name
+document.getElementById('orgName').textContent = 'Namma Nurse';
 
 // Fetch residents
 const loadResidents = async () => {

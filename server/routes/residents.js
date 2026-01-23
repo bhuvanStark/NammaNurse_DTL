@@ -17,10 +17,10 @@ router.get('/public', async (req, res) => {
     }
 });
 
-// Get all residents for organization
-router.get('/', auth, async (req, res) => {
+// Get all residents (no auth required)
+router.get('/', async (req, res) => {
     try {
-        const residents = await Resident.find({ orgId: req.orgId }).sort({ createdAt: -1 });
+        const residents = await Resident.find({}).sort({ createdAt: -1 });
         res.json({ residents });
     } catch (error) {
         console.error('Error fetching residents:', error);
@@ -28,13 +28,10 @@ router.get('/', auth, async (req, res) => {
     }
 });
 
-// Get single resident by ID
-router.get('/:id', auth, async (req, res) => {
+// Get single resident by ID (no auth required)
+router.get('/:id', async (req, res) => {
     try {
-        const resident = await Resident.findOne({
-            _id: req.params.id,
-            orgId: req.orgId
-        });
+        const resident = await Resident.findById(req.params.id);
 
         if (!resident) {
             return res.status(404).json({ error: 'Resident not found' });
@@ -55,12 +52,13 @@ router.get('/:id', auth, async (req, res) => {
     }
 });
 
-// Create new resident
-router.post('/', auth, async (req, res) => {
+// Create new resident (no auth required)
+router.post('/', async (req, res) => {
     try {
+        // Use a default orgId if needed for backward compatibility
         const residentData = {
             ...req.body,
-            orgId: req.orgId
+            orgId: req.body.orgId || '000000000000000000000000'
         };
 
         const resident = new Resident(residentData);
@@ -76,11 +74,11 @@ router.post('/', auth, async (req, res) => {
     }
 });
 
-// Update resident
-router.put('/:id', auth, async (req, res) => {
+// Update resident (no auth required)
+router.put('/:id', async (req, res) => {
     try {
-        const resident = await Resident.findOneAndUpdate(
-            { _id: req.params.id, orgId: req.orgId },
+        const resident = await Resident.findByIdAndUpdate(
+            req.params.id,
             req.body,
             { new: true, runValidators: true }
         );
@@ -99,13 +97,10 @@ router.put('/:id', auth, async (req, res) => {
     }
 });
 
-// Delete resident
-router.delete('/:id', auth, async (req, res) => {
+// Delete resident (no auth required)
+router.delete('/:id', async (req, res) => {
     try {
-        const resident = await Resident.findOneAndDelete({
-            _id: req.params.id,
-            orgId: req.orgId
-        });
+        const resident = await Resident.findByIdAndDelete(req.params.id);
 
         if (!resident) {
             return res.status(404).json({ error: 'Resident not found' });

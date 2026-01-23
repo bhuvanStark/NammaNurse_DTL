@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Namma Nurse - Healthcare Assistant</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .role-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .role-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .role-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .pulse-animation {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container max-w-6xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-5xl font-bold text-white mb-4 pulse-animation">
+                🏥 Namma Nurse
+            </h1>
+            <p class="text-xl text-white opacity-90">
+                Voice-First AI Healthcare Assistant for Old-Age Homes
+            </p>
+        </div>
+
+        <!-- Role Selection Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Caretaker Card -->
+            <div class="role-card bg-white rounded-2xl p-10 shadow-2xl text-center"
+                onclick="window.location.href='/caretaker/dashboard.html'">
+                <div class="role-icon">👨‍⚕️</div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Caretaker</h2>
+                <p class="text-gray-600 text-lg mb-6">
+                    Manage patients, view medical reports, and monitor health status
+                </p>
+                <div class="bg-blue-100 rounded-lg p-4">
+                    <p class="text-sm text-blue-800 font-semibold">✓ Patient Dashboard</p>
+                    <p class="text-sm text-blue-800 font-semibold">✓ Medical Reports</p>
+                    <p class="text-sm text-blue-800 font-semibold">✓ Health Monitoring</p>
+                </div>
+            </div>
+
+            <!-- Patient Card -->
+            <div class="role-card bg-white rounded-2xl p-10 shadow-2xl text-center"
+                onclick="window.location.href='/elderly/voice.html'">
+                <div class="role-icon">👴</div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Patient</h2>
+                <p class="text-gray-600 text-lg mb-6">
+                    Talk to Namma Nurse using voice, get health advice in Kannada or English
+                </p>
+                <div class="bg-purple-100 rounded-lg p-4">
+                    <p class="text-sm text-purple-800 font-semibold">✓ Voice Interface</p>
+                    <p class="text-sm text-purple-800 font-semibold">✓ Kannada & English</p>
+                    <p class="text-sm text-purple-800 font-semibold">✓ AI Health Assistant</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Info -->
+        <div class="text-center mt-12">
+            <p class="text-white opacity-75 text-sm">
+                Select your role to continue
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

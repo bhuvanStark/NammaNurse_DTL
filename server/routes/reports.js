@@ -11,8 +11,8 @@ const { generateHealthSummary } = require('../services/llmService');
 const { sendCriticalAlert } = require('../services/alertService');
 const path = require('path');
 
-// Upload report
-router.post('/upload', auth, upload.single('report'), async (req, res) => {
+// Upload report (no auth required)
+router.post('/upload', upload.single('report'), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ error: 'No file uploaded' });
@@ -20,11 +20,8 @@ router.post('/upload', auth, upload.single('report'), async (req, res) => {
 
         const { residentId } = req.body;
 
-        // Verify resident exists and belongs to this organization
-        const resident = await Resident.findOne({
-            _id: residentId,
-            orgId: req.orgId
-        });
+        // Verify resident exists
+        const resident = await Resident.findById(residentId);
 
         if (!resident) {
             return res.status(404).json({ error: 'Resident not found' });
@@ -83,18 +80,13 @@ router.post('/upload', auth, upload.single('report'), async (req, res) => {
     }
 });
 
-// Parse report (OCR + AI summary)
-router.post('/parse/:reportId', auth, async (req, res) => {
+// Parse report (OCR + AI summary) - no auth required
+router.post('/parse/:reportId', async (req, res) => {
     try {
         const report = await Report.findById(req.params.reportId).populate('residentId');
 
         if (!report) {
             return res.status(404).json({ error: 'Report not found' });
-        }
-
-        // Verify organization access
-        if (report.residentId.orgId.toString() !== req.orgId.toString()) {
-            return res.status(403).json({ error: 'Access denied' });
         }
 
         console.log('🔬 Starting report analysis...');
@@ -197,14 +189,11 @@ router.post('/parse/:reportId', auth, async (req, res) => {
     }
 });
 
-// Get all reports for a resident
-router.get('/resident/:residentId', auth, async (req, res) => {
+// Get all reports for a resident (no auth required)
+router.get('/resident/:residentId', async (req, res) => {
     try {
-        // Verify resident belongs to this organization
-        const resident = await Resident.findOne({
-            _id: req.params.residentId,
-            orgId: req.orgId
-        });
+        // Verify resident exists
+        const resident = await Resident.findById(req.params.residentId);
 
         if (!resident) {
             return res.status(404).json({ error: 'Resident not found' });
@@ -220,18 +209,13 @@ router.get('/resident/:residentId', auth, async (req, res) => {
     }
 });
 
-// Delete report
-router.delete('/:reportId', auth, async (req, res) => {
+// Delete report (no auth required)
+router.delete('/:reportId', async (req, res) => {
     try {
         const report = await Report.findById(req.params.reportId).populate('residentId');
 
         if (!report) {
             return res.status(404).json({ error: 'Report not found' });
-        }
-
-        // Verify organization access
-        if (report.residentId.orgId.toString() !== req.orgId.toString()) {
-            return res.status(403).json({ error: 'Access denied' });
         }
 
         // Delete the report file if it exists
@@ -255,8 +239,8 @@ router.delete('/:reportId', auth, async (req, res) => {
     }
 });
 
-// Get latest report for a resident
-router.get('/latest/:residentId', auth, async (req, res) => {
+// Get latest report for a resident (no auth required)
+router.get('/latest/:residentId', async (req, res) => {
     try {
         const report = await Report.findOne({ residentId: req.params.residentId })
             .sort({ uploadDate: -1 })
@@ -273,16 +257,13 @@ router.get('/latest/:residentId', auth, async (req, res) => {
     }
 });
 
-// Get trend data for graphs (chronologically sorted monthly reports)
-router.get('/trends/:residentId', auth, async (req, res) => {
+// Get trend data for graphs (chronologically sorted monthly reports) - no auth required
+router.get('/trends/:residentId', async (req, res) => {
     try {
         console.log('📊 Trends API called for resident:', req.params.residentId);
 
-        // Verify resident belongs to this organization
-        const resident = await Resident.findOne({
-            _id: req.params.residentId,
-            orgId: req.orgId
-        });
+        // Verify resident exists
+        const resident = await Resident.findById(req.params.residentId);
 
         if (!resident) {
             console.log('❌ Resident not found for ID:', req.params.residentId);

@@ -55,7 +55,7 @@ app.use('/api/voice', voiceRoutes);
 
 // Serve frontend
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../client/caretaker/login.html'));
+    res.sendFile(path.join(__dirname, '../client/index.html'));
 });
 
 // Error handling middleware
