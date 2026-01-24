@@ -52,7 +52,31 @@ const initializeSpeechRecognition = () => {
 
     recognition.onerror = (event) => {
         console.error('Speech recognition error:', event.error);
-        document.getElementById('statusText').textContent = 'Error: Please try again';
+
+        // If Kannada speech recognition failed due to language-not-supported, fall back to English
+        if (selectedLanguage === 'kannada' && (event.error === 'language-not-supported' || event.error === 'no-speech')) {
+            console.log('⚠️ Kannada speech recognition not supported. Trying English fallback...');
+
+            // Reinitialize with English
+            recognition.lang = 'en-IN';
+
+            // Show helpful message
+            document.getElementById('statusText').textContent = 'Browser doesn\'t support Kannada speech. Speak in English...';
+
+            // Auto-retry with English
+            setTimeout(() => {
+                try {
+                    recognition.start();
+                } catch (e) {
+                    console.error('Failed to restart recognition:', e);
+                    document.getElementById('statusText').textContent = 'Error: Please try again';
+                }
+            }, 1000);
+        } else {
+            // Other errors
+            document.getElementById('statusText').textContent = 'Error: Please try again';
+        }
+
         isListening = false;
         document.getElementById('micButton').classList.remove('listening');
     };
@@ -67,6 +91,12 @@ const selectLanguage = (lang) => {
     // Update UI
     document.getElementById('languageSelection').style.display = 'none';
     document.getElementById('voiceInterface').classList.add('active');
+
+    // Show browser support note for Kannada
+    if (lang === 'kannada') {
+        document.getElementById('statusText').innerHTML =
+            '📝 Note: Most browsers don\'t support Kannada speech input.<br>You can speak in English, and I\'ll reply in Kannada!<br><br>Tap mic to start';
+    }
 
     // Initialize speech recognition
     initializeSpeechRecognition();
@@ -151,6 +181,24 @@ const getAIResponse = async (userMessage) => {
         const data = await response.json();
 
         if (!response.ok) {
+            // Check if it's a rate limit error
+            if (response.status === 429 || response.status === 500) {
+                console.error('API Error:', data.error || 'Server error');
+
+                // Show fallback response based on language
+                const fallbackResponse = selectedLanguage === 'kannada'
+                    ? 'ಕ್ಷಮಿಸಿ, AI ಸೇವೆ ಈಗ ಲಭ್ಯವಿಲ್ಲ. ದಯವಿಟ್ಟು ನಿಮ್ಮ ಆರೋಗ್ಯ ಸಲಹೆಗಾಗಿ ವೈದ್ಯರನ್ನು ಭೇಟಿಯಾಗಿ. ನಿಮ್ಮ ಸ್ವಾಸ್ಥ್ಯ ಮುಖ್ಯ!'
+                    : 'Sorry, AI service is currently unavailable. Please consult your doctor for health advice. Your health is important!';
+
+                // Display and speak fallback
+                const responseBox = document.getElementById('responseBox');
+                responseBox.textContent = fallbackResponse;
+                responseBox.classList.add('visible');
+                speakText(fallbackResponse);
+                document.getElementById('statusText').textContent = '⚠️ AI unavailable - showing fallback message';
+                return;
+            }
+
             throw new Error(data.error || 'Failed to get response');
         }
 
@@ -166,6 +214,17 @@ const getAIResponse = async (userMessage) => {
 
     } catch (error) {
         console.error('Error getting AI response:', error);
+
+        // Fallback message on network error
+        const fallbackResponse = selectedLanguage === 'kannada'
+            ? 'ಕ್ಷಮಿಸಿ, ನಿಮ್ಮ ಪ್ರಶ್ನೆಗೆ ಉತ್ತರಿಸಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ. ದಯವಿಟ್ಟು ನಂತರ ಪ್ರಯತ್ನಿಸಿ.'
+            : 'Sorry, I could not answer your question. Please try again later.';
+
+        const responseBox = document.getElementById('responseBox');
+        responseBox.textContent = fallbackResponse;
+        responseBox.classList.add('visible');
+        speakText(fallbackResponse);
+
         document.getElementById('statusText').textContent = '❌ Error: ' + error.message;
     }
 };
