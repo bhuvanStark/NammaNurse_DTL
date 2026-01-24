@@ -19,14 +19,11 @@ const initializeSpeechRecognition = () => {
     recognition.continuous = false;
     recognition.interimResults = false;
 
-    // Set language based on user selection
-    if (selectedLanguage === 'kannada') {
-        recognition.lang = 'kn-IN'; // Kannada (India)
-        console.log('🎤 Speech recognition set to Kannada (kn-IN)');
-    } else {
-        recognition.lang = 'en-IN'; // English (India)
-        console.log('🎤 Speech recognition set to English (en-IN)');
-    }
+    // Always use English (India) for speech recognition
+    // Browser support for Kannada speech input is virtually non-existent
+    // Language selection only affects AI response language, not input
+    recognition.lang = 'en-IN';
+    console.log('🎤 Speech recognition set to English (en-IN)');
 
     recognition.onstart = () => {
         isListening = true;
