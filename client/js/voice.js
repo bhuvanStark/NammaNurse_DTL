@@ -19,8 +19,14 @@ const initializeSpeechRecognition = () => {
     recognition.continuous = false;
     recognition.interimResults = false;
 
-    // Use Indian English for better accent recognition
-    recognition.lang = 'en-IN';
+    // Set language based on user selection
+    if (selectedLanguage === 'kannada') {
+        recognition.lang = 'kn-IN'; // Kannada (India)
+        console.log('🎤 Speech recognition set to Kannada (kn-IN)');
+    } else {
+        recognition.lang = 'en-IN'; // English (India)
+        console.log('🎤 Speech recognition set to English (en-IN)');
+    }
 
     recognition.onstart = () => {
         isListening = true;
@@ -171,16 +177,44 @@ const speakText = (text) => {
 
     const utterance = new SpeechSynthesisUtterance(text);
 
-    // Try to find Indian voice
+    // Select voice based on selected language
     const voices = synthesis.getVoices();
-    const indianVoice = voices.find(v =>
-        v.lang.includes('en-IN') ||
-        v.lang.includes('hi-IN') ||
-        v.name.includes('India')
-    );
+    let selectedVoice = null;
 
-    if (indianVoice) {
-        utterance.voice = indianVoice;
+    if (selectedLanguage === 'kannada') {
+        // Try to find Kannada voice first
+        selectedVoice = voices.find(v =>
+            v.lang.includes('kn') ||
+            v.lang.includes('kn-IN') ||
+            v.name.toLowerCase().includes('kannada')
+        );
+
+        // Fallback to Hindi/Indian voice if Kannada not available
+        if (!selectedVoice) {
+            console.log('⚠️ No Kannada voice found, using Hindi/Indian voice as fallback');
+            selectedVoice = voices.find(v =>
+                v.lang.includes('hi-IN') ||
+                v.lang.includes('en-IN') ||
+                v.name.includes('India')
+            );
+        }
+
+        // Set language to Kannada for better pronunciation
+        utterance.lang = 'kn-IN';
+    } else {
+        // For English, use Indian English voice
+        selectedVoice = voices.find(v =>
+            v.lang.includes('en-IN') ||
+            v.name.includes('India')
+        );
+        utterance.lang = 'en-IN';
+    }
+
+    if (selectedVoice) {
+        utterance.voice = selectedVoice;
+        console.log(`🔊 Using voice: ${selectedVoice.name} (${selectedVoice.lang})`);
+    } else {
+        console.log('⚠️ No suitable voice found, using default');
     }
 
     // Slower rate for elderly
@@ -194,6 +228,11 @@ const speakText = (text) => {
 
     utterance.onend = () => {
         document.getElementById('statusText').textContent = 'Tap to speak again';
+    };
+
+    utterance.onerror = (event) => {
+        console.error('Speech synthesis error:', event.error);
+        document.getElementById('statusText').textContent = 'Error speaking. Tap to try again';
     };
 
     synthesis.speak(utterance);
