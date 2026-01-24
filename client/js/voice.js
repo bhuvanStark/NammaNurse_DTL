@@ -92,12 +92,6 @@ const selectLanguage = (lang) => {
     document.getElementById('languageSelection').style.display = 'none';
     document.getElementById('voiceInterface').classList.add('active');
 
-    // Show browser support note for Kannada
-    if (lang === 'kannada') {
-        document.getElementById('statusText').innerHTML =
-            '📝 Note: Most browsers don\'t support Kannada speech input.<br>You can speak in English, and I\'ll reply in Kannada!<br><br>Tap mic to start';
-    }
-
     // Initialize speech recognition
     initializeSpeechRecognition();
 
