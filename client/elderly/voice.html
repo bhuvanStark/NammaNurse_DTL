@@ -360,18 +360,18 @@
             try {
                 console.log('Fetching patient:', patientId);
                 const response = await fetch(`/api/residents/${patientId}`);
-                
+
                 console.log('Response status:', response.status);
-                
+
                 if (!response.ok) {
                     const errorText = await response.text();
                     console.error('Server error:', errorText);
                     throw new Error(`Server returned ${response.status}: ${errorText}`);
                 }
-                
+
                 const data = await response.json();
                 console.log('Patient data received:', data);
-                
+
                 selectedPatient = data.resident;
 
                 // Update patient info
@@ -382,7 +382,14 @@
                 // Generate intent buttons based on language
                 const lang = selectedPatient.preferredLanguage || 'kn';
                 console.log('Using language:', lang);
-                const labels = buttonLabels[lang];
+
+                // Fallback to 'kn' if language code is invalid
+                const labels = buttonLabels[lang] || buttonLabels['kn'];
+
+                if (!labels) {
+                    console.error('Invalid language configuration:', lang);
+                    throw new Error('Language configuration error');
+                }
 
                 const buttonsContainer = document.querySelector('.intent-buttons');
                 buttonsContainer.innerHTML = `
