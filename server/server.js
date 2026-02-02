@@ -64,16 +64,22 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: err.message || 'Internal server error' });
 });
 
-// Start server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log('\n' + '='.repeat(60));
-    console.log('🏥  NAMMA NURSE - Voice-First AI Healthcare Assistant');
-    console.log('='.repeat(60));
-    console.log(`✅  Server running on http://localhost:${PORT}`);
-    console.log(`📱  Caretaker Login: http://localhost:${PORT}/caretaker/login.html`);
-    console.log(`🎤  Elderly Voice UI: http://localhost:${PORT}/elderly/voice.html`);
-    console.log('='.repeat(60) + '\n');
-});
+// Start server (only in non-production/local environment)
+// In Vercel, the app is exported and handled by serverless functions
+if (process.env.NODE_ENV !== 'production') {
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+        console.log('\n' + '='.repeat(60));
+        console.log('🏥  NAMMA NURSE - Voice-First AI Healthcare Assistant');
+        console.log('='.repeat(60));
+        console.log(`✅  Server running on http://localhost:${PORT}`);
+        console.log(`📱  Caretaker Login: http://localhost:${PORT}/caretaker/login.html`);
+        console.log(`🎤  Elderly Voice UI: http://localhost:${PORT}/elderly/voice.html`);
+        console.log('='.repeat(60) + '\n');
+    });
+} else {
+    console.log('🚀 Running in Vercel serverless mode');
+}
 
+// Export the Express app for Vercel
 module.exports = app;
