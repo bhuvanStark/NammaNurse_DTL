@@ -358,8 +358,20 @@
         // Select a patient and show intent buttons
         async function selectPatient(patientId) {
             try {
+                console.log('Fetching patient:', patientId);
                 const response = await fetch(`/api/residents/${patientId}`);
+                
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Server error:', errorText);
+                    throw new Error(`Server returned ${response.status}: ${errorText}`);
+                }
+                
                 const data = await response.json();
+                console.log('Patient data received:', data);
+                
                 selectedPatient = data.resident;
 
                 // Update patient info
@@ -369,24 +381,25 @@
 
                 // Generate intent buttons based on language
                 const lang = selectedPatient.preferredLanguage || 'kn';
+                console.log('Using language:', lang);
                 const labels = buttonLabels[lang];
 
                 const buttonsContainer = document.querySelector('.intent-buttons');
                 buttonsContainer.innerHTML = `
                     <button class="intent-btn health" onclick="handleIntent('HEALTH_STATUS')">
-                        <span class="emoji">🟦</span>
+                        <span class="emoji">📊</span>
                         <span>${labels.health}</span>
                     </button>
                     <button class="intent-btn food" onclick="handleIntent('FOOD_ADVICE')">
-                        <span class="emoji">🟩</span>
+                        <span class="emoji">🥗</span>
                         <span>${labels.food}</span>
                     </button>
                     <button class="intent-btn exercise" onclick="handleIntent('EXERCISE_ADVICE')">
-                        <span class="emoji">🟨</span>
+                        <span class="emoji">🏃</span>
                         <span>${labels.exercise}</span>
                     </button>
                     <button class="intent-btn caretaker" onclick="handleCaretakerCall()">
-                        <span class="emoji">🟥</span>
+                        <span class="emoji">🆘</span>
                         <span>${labels.caretaker}</span>
                     </button>
                 `;
@@ -399,7 +412,7 @@
 
             } catch (error) {
                 console.error('Error selecting patient:', error);
-                alert('Failed to load patient information');
+                alert(`Failed to load patient information: ${error.message}`);
             }
         }
 
