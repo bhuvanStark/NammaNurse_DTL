@@ -4,188 +4,535 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Namma Nurse - Voice Assistant</title>
-    <link href="../css/styles.css" rel="stylesheet">
+    <title>Namma Nurse - Elderly Assistant</title>
     <style>
-        body {
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            font-family: Arial, sans-serif;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            padding: 20px;
         }
 
-        .elderly-container {
-            max-width: 600px;
+        .container {
+            max-width: 800px;
             width: 100%;
-            padding: 20px;
+        }
+
+        .header {
             text-align: center;
+            margin-bottom: 40px;
         }
 
         .logo {
             font-size: 48px;
             font-weight: bold;
             color: white;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
-        .language-selector {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin-bottom: 40px;
-        }
-
-        .lang-btn {
-            background: white;
-            color: #667eea;
-            font-size: 28px;
-            font-weight: 600;
-            padding: 20px 40px;
-            border: none;
-            border-radius: 16px;
-            cursor: pointer;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s;
-            min-width: 150px;
-        }
-
-        .lang-btn:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
-        }
-
-        .lang-btn.active {
-            background: #4CAF50;
+        .subtitle {
+            font-size: 20px;
             color: white;
+            opacity: 0.9;
         }
 
-        .voice-interface {
+        /* Patient Selection Screen */
+        .patient-selection {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .patient-selection h2 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .patient-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .patient-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 25px 20px;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .patient-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .patient-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Intent Buttons Screen */
+        .intent-screen {
             display: none;
         }
 
-        .voice-interface.active {
+        .intent-screen.active {
             display: block;
         }
 
-        .mic-button {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
+        .patient-info {
             background: white;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .patient-info h2 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .patient-info p {
+            font-size: 18px;
+            color: #666;
+        }
+
+        .back-btn {
+            background: #6b7280;
+            color: white;
             border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
             cursor: pointer;
-            margin: 40px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 80px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin-top: 15px;
             transition: all 0.3s;
         }
 
-        .mic-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        .back-btn:hover {
+            background: #4b5563;
         }
 
-        .mic-button.listening {
-            background: #f44336;
-            animation: pulse 1.5s ease-in-out infinite;
+        .intent-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
-        @keyframes pulse {
-
-            0%,
-            100% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.1);
-            }
-        }
-
-        .status-text {
-            font-size: 32px;
-            color: white;
-            margin: 20px 0;
-            min-height: 50px;
-            font-weight: 600;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .response-box {
-            background: white;
+        .intent-btn {
+            border: none;
             padding: 30px;
             border-radius: 16px;
-            margin: 20px 0;
-            font-size: 28px;
-            line-height: 1.6;
-            min-height: 100px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            font-size: 26px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            color: white;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .intent-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .intent-btn:active {
+            transform: translateY(0);
+        }
+
+        .intent-btn.health {
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+        }
+
+        .intent-btn.food {
+            background: linear-gradient(135deg, #10b981, #047857);
+        }
+
+        .intent-btn.exercise {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .intent-btn.caretaker {
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+        }
+
+        .intent-btn .emoji {
+            font-size: 40px;
+        }
+
+        /* Response Display */
+        .response-container {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             display: none;
         }
 
-        .response-box.visible {
+        .response-container.visible {
             display: block;
         }
 
-        .patient-selector {
-            background: white;
-            padding: 15px;
-            border-radius: 12px;
+        .response-text {
+            font-size: 24px;
+            line-height: 1.6;
+            color: #333;
             margin-bottom: 20px;
-            font-size: 20px;
         }
 
-        .patient-selector select {
-            width: 100%;
-            padding: 12px;
-            font-size: 20px;
-            border: 2px solid #667eea;
-            border-radius: 8px;
+        .status-message {
+            text-align: center;
+            padding: 20px;
+            border-radius: 12px;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .status-message.loading {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-message.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-message.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Loading Animation */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: #1e40af;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Accessibility */
+        @media (max-width: 768px) {
+            .patient-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .intent-btn {
+                font-size: 22px;
+                padding: 25px;
+            }
+
+            .response-text {
+                font-size: 20px;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div class="elderly-container">
-        <div class="logo">🏥 Namma Nurse</div>
-
-        <!-- Language Selection -->
-        <div id="languageSelection" class="language-selector">
-            <button class="lang-btn" onclick="selectLanguage('kannada')">ಕನ್ನಡ</button>
-            <button class="lang-btn" onclick="selectLanguage('english')">English</button>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🏥 Namma Nurse</div>
+            <div class="subtitle">Your AI Healthcare Assistant</div>
         </div>
 
-        <!-- Voice Interface -->
-        <div id="voiceInterface" class="voice-interface">
-            <!-- Patient Selector -->
-            <div class="patient-selector">
-                <label style="display: block; margin-bottom: 10px; font-weight: bold;">Select Patient:</label>
-                <select id="patientSelect">
-                    <option value="">Loading patients...</option>
-                </select>
+        <!-- Patient Selection Screen -->
+        <div id="patientSelection" class="patient-selection">
+            <h2>Select Patient</h2>
+            <div id="patientGrid" class="patient-grid">
+                <!-- Patients will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Intent Buttons Screen -->
+        <div id="intentScreen" class="intent-screen">
+            <div class="patient-info">
+                <h2 id="selectedPatientName">Patient Name</h2>
+                <p id="selectedPatientDetails">Room • Age</p>
+                <button class="back-btn" onclick="goBack()">← Back to Patient Selection</button>
             </div>
 
-            <!-- Mic Button -->
-            <button id="micButton" class="mic-button">🎤</button>
+            <div class="intent-buttons">
+                <!-- Buttons will be dynamically generated based on language -->
+            </div>
 
-            <!-- Status -->
-            <div id="statusText" class="status-text">Tap to speak</div>
+            <div id="responseContainer" class="response-container">
+                <div id="responseText" class="response-text"></div>
+            </div>
 
-            <!-- Response Box -->
-            <div id="responseBox" class="response-box"></div>
+            <div id="statusMessage" style="display: none;"></div>
         </div>
     </div>
 
-    <script src="../js/voice.js"></script>
+    <script>
+        let patients = [];
+        let selectedPatient = null;
+
+        // Button labels in both languages
+        const buttonLabels = {
+            en: {
+                health: 'Current Health Status',
+                food: 'What Food Should I Eat?',
+                exercise: 'What Exercises Can I Do?',
+                caretaker: 'Call Caretaker / Help'
+            },
+            kn: {
+                health: 'ನನ್ನ ಆರೋಗ್ಯ ಸ್ಥಿತಿ',
+                food: 'ನಾನು ಏನು ತಿನ್ನಬೇಕು?',
+                exercise: 'ನಾನು ಯಾವ ವ್ಯಾಯಾಮ ಮಾಡಬಹುದು?',
+                caretaker: 'ಸಹಾಯಕ್ಕಾಗಿ ಕರೆ ಮಾಡಿ'
+            }
+        };
+
+        const confirmationMessages = {
+            en: 'Caretaker has been notified.',
+            kn: 'ಪಾಲಕರಿಗೆ ಮಾಹಿತಿ ಕಳುಹಿಸಲಾಗಿದೆ.'
+        };
+
+        // Load patients on page load
+        async function loadPatients() {
+            try {
+                const response = await fetch('/api/residents/public');
+                const data = await response.json();
+                patients = data.residents;
+
+                const grid = document.getElementById('patientGrid');
+                grid.innerHTML = '';
+
+                patients.forEach(patient => {
+                    const btn = document.createElement('button');
+                    btn.className = 'patient-btn';
+                    btn.innerHTML = `
+                        ${patient.name}<br>
+                        <small style="font-size: 16px; opacity: 0.9;">Room ${patient.room}</small>
+                    `;
+                    btn.onclick = () => selectPatient(patient._id);
+                    grid.appendChild(btn);
+                });
+            } catch (error) {
+                console.error('Error loading patients:', error);
+                document.getElementById('patientGrid').innerHTML = '<p style="text-align: center; color: #666;">Failed to load patients</p>';
+            }
+        }
+
+        // Select a patient and show intent buttons
+        async function selectPatient(patientId) {
+            try {
+                const response = await fetch(`/api/residents/${patientId}`);
+                const data = await response.json();
+                selectedPatient = data.resident;
+
+                // Update patient info
+                document.getElementById('selectedPatientName').textContent = selectedPatient.name;
+                document.getElementById('selectedPatientDetails').textContent =
+                    `Room ${selectedPatient.room} • ${selectedPatient.age} years`;
+
+                // Generate intent buttons based on language
+                const lang = selectedPatient.preferredLanguage || 'kn';
+                const labels = buttonLabels[lang];
+
+                const buttonsContainer = document.querySelector('.intent-buttons');
+                buttonsContainer.innerHTML = `
+                    <button class="intent-btn health" onclick="handleIntent('HEALTH_STATUS')">
+                        <span class="emoji">🟦</span>
+                        <span>${labels.health}</span>
+                    </button>
+                    <button class="intent-btn food" onclick="handleIntent('FOOD_ADVICE')">
+                        <span class="emoji">🟩</span>
+                        <span>${labels.food}</span>
+                    </button>
+                    <button class="intent-btn exercise" onclick="handleIntent('EXERCISE_ADVICE')">
+                        <span class="emoji">🟨</span>
+                        <span>${labels.exercise}</span>
+                    </button>
+                    <button class="intent-btn caretaker" onclick="handleCaretakerCall()">
+                        <span class="emoji">🟥</span>
+                        <span>${labels.caretaker}</span>
+                    </button>
+                `;
+
+                // Show intent screen
+                document.getElementById('patientSelection').style.display = 'none';
+                document.getElementById('intentScreen').classList.add('active');
+                document.getElementById('responseContainer').classList.remove('visible');
+                document.getElementById('statusMessage').style.display = 'none';
+
+            } catch (error) {
+                console.error('Error selecting patient:', error);
+                alert('Failed to load patient information');
+            }
+        }
+
+        // Handle intent button click
+        async function handleIntent(intent) {
+            const statusMsg = document.getElementById('statusMessage');
+            const responseContainer = document.getElementById('responseContainer');
+            const responseText = document.getElementById('responseText');
+
+            // Show loading
+            statusMsg.className = 'status-message loading';
+            statusMsg.innerHTML = 'Thinking...<span class="loading-spinner"></span>';
+            statusMsg.style.display = 'block';
+            responseContainer.classList.remove('visible');
+
+            try {
+                const response = await fetch('/api/voice/intent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        residentId: selectedPatient._id,
+                        intent: intent,
+                        language: selectedPatient.preferredLanguage
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Hide loading, show response
+                    statusMsg.style.display = 'none';
+                    responseText.textContent = data.response;
+                    responseContainer.classList.add('visible');
+
+                    // Play text-to-speech
+                    playTextToSpeech(data.response, selectedPatient.preferredLanguage);
+                } else {
+                    throw new Error(data.error || 'Failed to get response');
+                }
+
+            } catch (error) {
+                console.error('Error handling intent:', error);
+                statusMsg.className = 'status-message error';
+                statusMsg.textContent = 'Failed to get response. Please try again.';
+            }
+        }
+
+        // Handle caretaker call
+        async function handleCaretakerCall() {
+            const statusMsg = document.getElementById('statusMessage');
+            const responseContainer = document.getElementById('responseContainer');
+
+            // Show loading
+            statusMsg.className = 'status-message loading';
+            statusMsg.innerHTML = 'Calling caretaker...<span class="loading-spinner"></span>';
+            statusMsg.style.display = 'block';
+            responseContainer.classList.remove('visible');
+
+            try {
+                const response = await fetch('/api/voice/caretaker-alert', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        residentId: selectedPatient._id
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Show success message
+                    const lang = selectedPatient.preferredLanguage || 'kn';
+                    const message = confirmationMessages[lang];
+
+                    statusMsg.className = 'status-message success';
+                    statusMsg.textContent = message;
+
+                    // Play confirmation
+                    playTextToSpeech(message, lang);
+
+                    // Hide message after 5 seconds
+                    setTimeout(() => {
+                        statusMsg.style.display = 'none';
+                    }, 5000);
+                } else {
+                    throw new Error(data.error || 'Failed to send alert');
+                }
+
+            } catch (error) {
+                console.error('Error calling caretaker:', error);
+                statusMsg.className = 'status-message error';
+                statusMsg.textContent = 'Failed to call caretaker. Please try again.';
+            }
+        }
+
+        // Text-to-speech function
+        function playTextToSpeech(text, language) {
+            if ('speechSynthesis' in window) {
+                // Cancel any ongoing speech
+                window.speechSynthesis.cancel();
+
+                const utterance = new SpeechSynthesisUtterance(text);
+
+                // Set language
+                if (language === 'kn') {
+                    utterance.lang = 'kn-IN'; // Kannada
+                } else {
+                    utterance.lang = 'en-IN'; // English (India)
+                }
+
+                utterance.rate = 0.9; // Slightly slower for elderly
+                utterance.pitch = 1;
+                utterance.volume = 1;
+
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Go back to patient selection
+        function goBack() {
+            document.getElementById('intentScreen').classList.remove('active');
+            document.getElementById('patientSelection').style.display = 'block';
+            selectedPatient = null;
+
+            // Stop any ongoing speech
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', loadPatients);
+    </script>
 </body>
 
 </html>

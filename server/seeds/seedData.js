@@ -48,7 +48,7 @@ const seedData = async () => {
                     { name: 'Suresh Kumar', relationship: 'Son', phone: '+919876543210' }
                 ],
                 riskLevel: 'attention',
-                preferredLanguage: 'kannada'
+                preferredLanguage: 'kn'
             },
             {
                 name: 'Lakshmi Devi',
@@ -64,7 +64,7 @@ const seedData = async () => {
                     { name: 'Priya K', relationship: 'Daughter', phone: '+919123456780' }
                 ],
                 riskLevel: 'normal',
-                preferredLanguage: 'kannada'
+                preferredLanguage: 'kn'
             },
             {
                 name: 'Venkatesh Rao',
@@ -81,7 +81,7 @@ const seedData = async () => {
                     { name: 'Ravi Rao', relationship: 'Son', phone: '+919998887770' }
                 ],
                 riskLevel: 'critical',
-                preferredLanguage: 'english'
+                preferredLanguage: 'en'
             },
             {
                 name: 'Saraswati Bai',
@@ -98,7 +98,7 @@ const seedData = async () => {
                     { name: 'Manjunath B', relationship: 'Nephew', phone: '+918888777766' }
                 ],
                 riskLevel: 'attention',
-                preferredLanguage: 'kannada'
+                preferredLanguage: 'kn'
             },
             {
                 name: 'Gopal Shetty',
@@ -115,7 +115,7 @@ const seedData = async () => {
                     { name: 'Anita Shetty', relationship: 'Daughter', phone: '+917777666655' }
                 ],
                 riskLevel: 'critical',
-                preferredLanguage: 'kannada'
+                preferredLanguage: 'kn'
             },
             {
                 name: 'Radha Hegde',
@@ -131,7 +131,7 @@ const seedData = async () => {
                     { name: 'Shyam Hegde', relationship: 'Husband', phone: '+916666555544' }
                 ],
                 riskLevel: 'normal',
-                preferredLanguage: 'kannada'
+                preferredLanguage: 'kn'
             },
             {
                 name: 'Krishnan Iyer',
@@ -148,7 +148,7 @@ const seedData = async () => {
                     { name: 'Lakshmi Iyer', relationship: 'Wife', phone: '+915555444433' }
                 ],
                 riskLevel: 'critical',
-                preferredLanguage: 'english'
+                preferredLanguage: 'en'
             },
             {
                 name: 'Sumitra Nair',
@@ -165,7 +165,7 @@ const seedData = async () => {
                     { name: 'Vijay Nair', relationship: 'Son', phone: '+914444333322' }
                 ],
                 riskLevel: 'normal',
-                preferredLanguage: 'english'
+                preferredLanguage: 'en'
             },
             {
                 name: 'Manjunath Gowda',
@@ -182,7 +182,7 @@ const seedData = async () => {
                     { name: 'Deepa Gowda', relationship: 'Daughter-in-law', phone: '+913333222211' }
                 ],
                 riskLevel: 'attention',
-                preferredLanguage: 'kannada'
+                preferredLanguage: 'kn'
             },
             {
                 name: 'Parvati Amma',
@@ -198,7 +198,7 @@ const seedData = async () => {
                     { name: 'Mohan K', relationship: 'Son', phone: '+912222111100' }
                 ],
                 riskLevel: 'normal',
-                preferredLanguage: 'kannada'
+                preferredLanguage: 'kn'
             }
         ];
 

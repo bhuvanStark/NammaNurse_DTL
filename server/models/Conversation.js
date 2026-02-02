@@ -16,7 +16,7 @@ const conversationSchema = new mongoose.Schema({
     },
     language: {
         type: String,
-        enum: ['kannada', 'english'],
+        enum: ['en', 'kn'],
         required: true
     },
     timestamp: {

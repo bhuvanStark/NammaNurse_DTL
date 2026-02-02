@@ -17,7 +17,7 @@ const generateHealthSummary = async (biomarkers, language = 'english') => {
 Patient's latest test results:
 ${biomarkerText}
 
-Generate a health summary in ${language === 'kannada' ? 'Kannada' : 'English'} following these rules:
+Generate a health summary in ${language === 'kn' ? 'Kannada' : 'English'} following these rules:
 1. Use simple, warm, reassuring language (no medical jargon)
 2. Keep it to 2-3 sentences maximum
 3. If values are high/critical, mention them gently
@@ -25,7 +25,7 @@ Generate a health summary in ${language === 'kannada' ? 'Kannada' : 'English'} f
 5. Always end with: "Please consult your doctor for medical advice"
 6. For elderly: speak like a caring nurse, not a robot
 
-${language === 'kannada' ? 'Response should be in Kannada script.' : ''}
+${language === 'kn' ? 'Response should be in Kannada script.' : ''}
 
 Health Summary:`;
 
@@ -40,7 +40,7 @@ Health Summary:`;
         console.error('❌ Gemini API Error:', error.message);
 
         // Fallback summary
-        if (language === 'kannada') {
+        if (language === 'kn') {
             return 'ನಿಮ್ಮ ವರದಿ ಸಿದ್ಧವಾಗಿದೆ. ದಯವಿಟ್ಟು ವೈದ್ಯರನ್ನು ಭೇಟಿಯಾಗಿ.';
         }
         return 'Your report is ready. Please consult your doctor for detailed advice.';
@@ -228,7 +228,7 @@ ${summaryContext}
 PATIENT ASKED: "${userQuestion}"
 
 INSTRUCTIONS FOR YOUR RESPONSE:
-1. Answer in ${language === 'kannada' ? 'KANNADA SCRIPT (ಕನ್ನಡ)' : 'ENGLISH'}
+1. Answer in ${language === 'kn' ? 'KANNADA SCRIPT (ಕನ್ನಡ)' : 'ENGLISH'}
 2. Use a warm, caring tone - speak like a nurse who deeply cares about the patient
 3. Keep response to 2-4 sentences maximum
 4. Use SIMPLE language (avoid medical jargon)
@@ -268,7 +268,7 @@ QUESTION TYPE GUIDANCE:
 6. ALWAYS end with gentle reassurance or encouragement
 7. If uncertain or question needs doctor, say "Please consult your doctor for medical advice"
 
-${language === 'kannada' ? '\n🔴 CRITICAL: Your ENTIRE response MUST be in Kannada script (ಕನ್ನಡ). Do NOT use English characters.\n' : ''}
+${language === 'kn' ? '\n🔴 CRITICAL: Your ENTIRE response MUST be in Kannada script (ಕನ್ನಡ). Do NOT use English characters.\n' : ''}
 
 YOUR CARING RESPONSE:`;
 
@@ -295,7 +295,7 @@ YOUR CARING RESPONSE:`;
         console.error('❌ Gemini Voice API Error:', error.message);
 
         // Fallback responses
-        if (language === 'kannada') {
+        if (language === 'kn') {
             return 'ನಿಮ್ಮ ಆರೋಗ್ಯ ಒಳ್ಳೆಯದಾಗಿದೆ. ಚಿಂತಿಸಬೇಡಿ. ವೈದ್ಯರನ್ನು ಭೇಟಿಯಾಗಿ.';
         }
         return 'Your health is being monitored. Please consult your doctor for detailed guidance.';

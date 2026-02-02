@@ -100,6 +100,131 @@ router.post('/chat', async (req, res) => {
     }
 });
 
+// Intent-based endpoint for button interactions
+router.post('/intent', async (req, res) => {
+    try {
+        const { residentId, intent, language } = req.body;
+
+        if (!residentId || !intent) {
+            return res.status(400).json({ error: 'residentId and intent are required' });
+        }
+
+        // Get complete resident profile
+        const resident = await Resident.findById(residentId);
+        if (!resident) {
+            return res.status(404).json({ error: 'Resident not found' });
+        }
+
+        // Use resident's preferred language if not specified
+        const responseLanguage = language || resident.preferredLanguage;
+
+        // Get latest 3 reports for context
+        const recentReports = await Report.find({ residentId })
+            .sort({ uploadDate: -1 })
+            .limit(3);
+
+        console.log(`🎯 Intent Request - ${resident.name}: ${intent} (${responseLanguage})`);
+
+        // Map intent to natural language query
+        const intentQueries = {
+            HEALTH_STATUS: 'What is my current health status based on my latest reports?',
+            FOOD_ADVICE: 'What food should I eat based on my medical conditions?',
+            EXERCISE_ADVICE: 'What exercises can I do safely given my age and conditions?'
+        };
+
+        const query = intentQueries[intent];
+        if (!query) {
+            return res.status(400).json({ error: 'Invalid intent' });
+        }
+
+        // Generate AI response with full context
+        const aiResponse = await generateVoiceResponse(
+            query,
+            resident,
+            recentReports,
+            responseLanguage
+        );
+
+        // Save conversation
+        const conversation = new Conversation({
+            residentId,
+            userSaid: `[${intent}] ${query}`,
+            aiResponse,
+            language: responseLanguage
+        });
+
+        await conversation.save();
+
+        console.log(`🤖 Intent Response: "${aiResponse.substring(0, 100)}..."`);
+
+        res.json({
+            message: 'Response generated successfully',
+            response: aiResponse,
+            intent: intent,
+            language: responseLanguage,
+            patientContext: {
+                name: resident.name,
+                age: resident.age,
+                conditions: resident.conditions
+            }
+        });
+
+    } catch (error) {
+        console.error('Error in intent handler:', error);
+        res.status(500).json({ error: 'Failed to generate response' });
+    }
+});
+
+// Caretaker alert endpoint
+router.post('/caretaker-alert', async (req, res) => {
+    try {
+        const { residentId } = req.body;
+
+        if (!residentId) {
+            return res.status(400).json({ error: 'residentId is required' });
+        }
+
+        const resident = await Resident.findById(residentId);
+        if (!resident) {
+            return res.status(404).json({ error: 'Resident not found' });
+        }
+
+        // Import email service
+        const { sendCaretakerAlert } = require('../services/emailService');
+
+        // Format timestamp
+        const timestamp = new Date().toLocaleString('en-IN', {
+            timeZone: 'Asia/Kolkata',
+            dateStyle: 'medium',
+            timeStyle: 'short'
+        });
+
+        // Send alert
+        const result = await sendCaretakerAlert(
+            resident.name,
+            resident.room,
+            timestamp
+        );
+
+        console.log(`🚨 Caretaker alert sent for ${resident.name} (Room ${resident.room})`);
+
+        res.json({
+            message: 'Caretaker has been notified',
+            success: true,
+            method: result.method,
+            patient: {
+                name: resident.name,
+                room: resident.room
+            },
+            timestamp: timestamp
+        });
+
+    } catch (error) {
+        console.error('Error sending caretaker alert:', error);
+        res.status(500).json({ error: 'Failed to send alert' });
+    }
+});
+
 // Get conversation history
 router.get('/history/:residentId', async (req, res) => {
     try {
@@ -117,3 +242,4 @@ router.get('/history/:residentId', async (req, res) => {
 });
 
 module.exports = router;
+

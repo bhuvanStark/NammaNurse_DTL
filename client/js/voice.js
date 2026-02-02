@@ -157,6 +157,18 @@ const getAIResponse = async (userMessage) => {
     try {
         document.getElementById('statusText').textContent = '🤔 Thinking...';
 
+        // Special handling for "blood report" keyword in Kannada mode
+        if (selectedLanguage === 'kannada' && userMessage.toLowerCase().includes('blood report')) {
+            const bloodReportResponse = 'ರಕ್ತ ವರದಿ - ನಿಮ್ಮ ರಕ್ತ ವರದಿಯನ್ನು ನೋಡಲು, ದಯವಿಟ್ಟು ನಿಮ್ಮ ಆರೈಕೆದಾರರನ್ನು ಸಂಪರ್ಕಿಸಿ. ಅವರು ನಿಮ್ಮ ಎಲ್ಲಾ ವೈದ್ಯಕೀಯ ವರದಿಗಳನ್ನು ನಿಮಗಾಗಿ ಆ್ಯಕ್ಸೆಸ್ ಮಾಡಬಹುದು.';
+
+            const responseBox = document.getElementById('responseBox');
+            responseBox.textContent = bloodReportResponse;
+            responseBox.classList.add('visible');
+            speakText(bloodReportResponse);
+            document.getElementById('statusText').textContent = '✅ ರಕ್ತ ವರದಿ ಮಾಹಿತಿ';
+            return;
+        }
+
         const response = await fetch('/api/voice/chat', {
             method: 'POST',
             headers: {

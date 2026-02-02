@@ -52,8 +52,8 @@ const residentSchema = new mongoose.Schema({
     },
     preferredLanguage: {
         type: String,
-        enum: ['kannada', 'english'],
-        default: 'kannada'
+        enum: ['en', 'kn'],
+        default: 'kn'
     },
     createdAt: {
         type: Date,
