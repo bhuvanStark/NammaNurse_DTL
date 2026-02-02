@@ -6,12 +6,13 @@
 
 ## ✨ Features
 
-### 👴 **Elderly Voice Interface**
-- 🎤 **Hands-free voice interaction** using Web Speech API
-- 🗣️ **Bilingual support**: Kannada + English
-- 🤖 **AI-powered responses** using Google Gemini 2.0 Flash
-- 🔊 **Text-to-speech** for spoken responses
-- 📱 **Large buttons** and high-contrast design for low vision
+### 👴 **Elderly Interface**
+- 🎯 **Button-based intent selection** (Health Status, Food Advice, Exercise Advice, Emergency Help)
+- 🗣️ **Bilingual support**: Kannada (ಕನ್ನಡ) + English with language preference storage
+- 🤖 **AI-powered personalized responses** using Google Gemini 2.0 Flash
+- 🔊 **Text-to-speech** for spoken responses in preferred language
+- 📱 **Extra-large buttons** with high-contrast design for accessibility
+- 📧 **Automatic email alerts** to caretakers for emergency help requests
 
 ### 👨‍⚕️ **Caretaker Dashboard**
 - 🔐 **Secure authentication** with JWT
@@ -57,9 +58,10 @@
 
 ### Setup Instructions
 
-1. **Clone or navigate to project directory**
+1. **Clone the repository**
    ```bash
-   cd /Users/bhuvan/Desktop/DTL_main
+   git clone https://github.com/bhuvanStark/NammaNurse_DTL.git
+   cd NammaNurse_DTL
    ```
 
 2. **Install dependencies**
@@ -72,10 +74,17 @@
    cp .env.example .env
    ```
    
-   Edit `.env` and add your Gemini API key:
+   Edit `.env` and add your credentials:
    ```env
    GEMINI_API_KEY=your-actual-gemini-key-here
+   
+   # Email service (for emergency alerts)
+   EMAIL_USER=your-gmail@gmail.com
+   EMAIL_PASS=your-app-specific-password
+   CARETAKER_EMAIL=caretaker-email@example.com
    ```
+   
+   > **Note**: For Gmail, generate an [App Password](https://support.google.com/accounts/answer/185833) instead of using your regular password.
 
 4. **Start MongoDB** (if running locally)
    ```bash
@@ -134,18 +143,20 @@
 
 1. **Open** `/elderly/voice.html`
 
-2. **Select language**: ಕನ್ನಡ or English
+2. **Select language**: ಕನ್ನಡ (Kannada) or English
+   - Your language preference is remembered for next time
 
 3. **Select your name** from the dropdown
 
-4. **Tap the microphone button** 🎤
+4. **Choose what you want to know** by tapping one of the large buttons:
+   - 📊 **My Health Status** - Get personalized health update based on latest reports
+   - 🥗 **Food Advice** - Get dietary recommendations tailored to your conditions
+   - 🏃 **Exercise Advice** - Get safe exercise suggestions for your health
+   - 🆘 **Call for Help** - Send emergency alert email to caretaker
 
-5. **Ask questions** like:
-   - "How is my sugar?"
-   - "Am I healthy?"
-   - "ನನ್ನ ಆರೋಗ್ಯ ಹೇಗಿದೆ?" (How is my health?)
+5. **Listen** to the AI response (spoken aloud in your preferred language)
 
-6. **Listen** to the AI response (spoken aloud)
+6. **Ask another question** or choose a different button anytime
 
 ---
 
@@ -216,7 +227,8 @@ DTL_main/
 │   │   ├── ocrService.js      # Tesseract OCR
 │   │   ├── biomarkerParser.js # Extract health values
 │   │   ├── llmService.js      # Gemini summaries
-│   │   └── alertService.js    # Critical alerts
+│   │   ├── alertService.js    # Critical alerts
+│   │   └── emailService.js    # Email notifications
 │   ├── seeds/
 │   │   └── seedData.js        # 10 sample patients
 │   └── server.js              # Express app
@@ -242,25 +254,36 @@ DTL_main/
 
 ---
 
-## 🎤 Voice Interface Technical Details
+## 🎯 Elderly Interface Technical Details
 
-### **Web Speech API**
-- **Language**: `en-IN` (Indian English) for better accent recognition
-- **Continuous**: `false` (one question at a time)
-- **Works best in**: Chrome, Edge
+### **Intent-Based Interaction System**
+- **Button Actions**: Health Status, Food Advice, Exercise Advice, Emergency Help
+- **Language Support**: English (`en`) and Kannada (`kn`)
+- **Language Persistence**: Stores preference in localStorage for returning users
+- **Patient Context**: Automatically loads patient's medical history and conditions
 
 ### **Gemini AI Prompts**
-- Warm, caring tone (like talking to grandmother)
+- Warm, caring tone (like talking to a family member)
 - Simple language (3rd grade reading level)
-- Max 2-3 sentences
-- Avoids medical jargon and numbers
-- Includes practical tip
-- Ends with reassurance
+- Max 2-3 sentences for clarity
+- Avoids medical jargon and complex numbers
+- Context-aware based on intent and patient's medical reports
+- Personalized to patient's conditions and recent biomarkers
+- Includes practical, actionable tips
+- Ends with reassurance and encouragement
 
 ### **Text-to-Speech Settings**
-- **Rate**: 0.85 (slower for elderly)
-- **Pitch**: 1.1 (slightly higher, friendlier)
-- **Voice**: Auto-selects Indian English or Hindi voice if available
+- **Rate**: 0.85 (slower for elderly comprehension)
+- **Pitch**: 1.1 (slightly higher, friendlier tone)
+- **Voice**: Auto-selects language-appropriate voice
+  - English: Indian English voice preferred
+  - Kannada: Kannada voice if available, Hindi as fallback
+
+### **Email Alert System**
+- **Trigger**: "Call for Help" button
+- **Sends To**: Configured caretaker email
+- **Includes**: Patient name, timestamp, recent health status
+- **Service**: Gmail SMTP with app-specific passwords
 
 ---
 
@@ -282,10 +305,21 @@ MONGODB_URI=mongodb://localhost:27017/namma_nurse
 GEMINI_API_KEY=your-actual-key-here
 ```
 
-### **Voice Recognition Not Working**
+### **Email Service Not Working**
+```bash
+# For Gmail, use App Password instead of regular password
+# 1. Enable 2-factor authentication on your Google account
+# 2. Generate App Password at: https://myaccount.google.com/apppasswords
+# 3. Add to .env:
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASS=your-16-character-app-password
+CARETAKER_EMAIL=recipient@example.com
+```
+
+### **Text-to-Speech Not Speaking**
 - Use **Chrome** or **Edge** browser
-- Allow microphone permissions when prompted
-- Ensure you're on `localhost` (not `127.0.0.1`)
+- Check that volume is on and not muted
+- Some browsers require HTTPS for TTS (localhost is OK)
 - Check browser console for errors
 
 ### **OCR Not Extracting Text**
